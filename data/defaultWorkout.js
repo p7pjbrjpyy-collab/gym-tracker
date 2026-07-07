@@ -1,12 +1,9 @@
 // =================================
 // Gym Tracker
-// Workout Data
-// Version 0.3
+// Default Workout Template
 // =================================
 
-
-const currentWorkout = [
-
+const defaultWorkout = [
     {
         id: 1,
         name: "Row (Warm-up)",
@@ -15,8 +12,6 @@ const currentWorkout = [
         weight: "-",
         rest: "-"
     },
-
-
     {
         id: 2,
         name: "Lat Pulldown",
@@ -25,8 +20,6 @@ const currentWorkout = [
         weight: "30 kg",
         rest: "30 sec"
     },
-
-
     {
         id: 3,
         name: "DB Bench Press",
@@ -35,8 +28,6 @@ const currentWorkout = [
         weight: "15 kg each",
         rest: "30 sec"
     },
-
-
     {
         id: 4,
         name: "Shoulder Press (DB)",
@@ -45,8 +36,6 @@ const currentWorkout = [
         weight: "15 kg",
         rest: "60 sec"
     },
-
-
     {
         id: 5,
         name: "Pec Fly",
@@ -55,8 +44,6 @@ const currentWorkout = [
         weight: "7 kg",
         rest: "30 sec"
     },
-
-
     {
         id: 6,
         name: "Low Row",
@@ -65,8 +52,6 @@ const currentWorkout = [
         weight: "30 kg",
         rest: "45 sec"
     },
-
-
     {
         id: 7,
         name: "Single-Leg Leg Extension",
@@ -75,8 +60,6 @@ const currentWorkout = [
         weight: "20 kg",
         rest: "Continuous"
     },
-
-
     {
         id: 8,
         name: "Goblet Squat",
@@ -85,8 +68,6 @@ const currentWorkout = [
         weight: "10 kg kettlebell",
         rest: "30 sec"
     },
-
-
     {
         id: 9,
         name: "Split Squat",
@@ -95,8 +76,6 @@ const currentWorkout = [
         weight: "10 kg kettlebell",
         rest: "30 sec"
     },
-
-
     {
         id: 10,
         name: "Mobility",
@@ -105,5 +84,4 @@ const currentWorkout = [
         weight: "-",
         rest: "-"
     }
-
 ];

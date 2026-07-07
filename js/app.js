@@ -56,7 +56,12 @@ function showWorkout() {
 
 
 
-    currentWorkout.forEach(
+    const gymData = loadData();
+
+const workout = gymData.workoutTemplate;
+
+workout.forEach(
+    
         exercise => {
 
 
