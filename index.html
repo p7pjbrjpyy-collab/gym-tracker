@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Gym</title>
+
+    <title>Gym Tracker</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,35 +14,59 @@
 
 <div class="container">
 
-    <h1>🏋️ My Gym</h1>
+    <header>
+        <h1>🏋️ Gym Tracker</h1>
+        <p class="subtitle">
+            Welcome James 👋
+        </p>
+    </header>
 
-    <p class="subtitle">
-        Your personal workout tracker
-    </p>
 
-    <div class="menu">
+    <main>
 
-        <button id="startWorkout">
-            Start Workout
+        <button class="primary" id="startWorkout">
+            ▶ Start Workout
         </button>
 
         <button id="history">
-            History
+            📜 Workout History
         </button>
 
-        <button id="editWorkout">
-            Edit Workout
+        <button id="progress">
+            📈 Progress
         </button>
 
         <button id="settings">
-            Settings
+            ⚙ Settings
         </button>
 
-    </div>
+
+        <section class="last-workout">
+
+            <h2>Last Workout</h2>
+
+            <p>
+                No workouts recorded yet
+            </p>
+
+        </section>
+
+
+    </main>
+
+
+    <footer>
+
+        Gym Tracker v0.2
+
+    </footer>
+
 
 </div>
+
 
 <script src="app.js"></script>
 
 </body>
+
 </html>

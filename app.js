@@ -1,20 +1,37 @@
-// ===============================
-// My Gym
-// Version 1.0
-// ===============================
+// =================================
+// Gym Tracker
+// Version 0.2
+// =================================
 
-document.addEventListener("DOMContentLoaded", () => {
 
-    const buttons = document.querySelectorAll("button");
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    buttons.forEach(button => {
 
-        button.addEventListener("click", () => {
+        const buttons =
+            document.querySelectorAll("button");
 
-            alert("This section is coming soon!");
+
+        buttons.forEach(button => {
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+
+                    console.log(
+                        button.innerText
+                    );
+
+
+                }
+            );
+
 
         });
 
-    });
 
-});
+    }
+);
