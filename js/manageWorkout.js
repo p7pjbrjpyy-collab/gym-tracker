@@ -21,11 +21,7 @@ function showManageWorkout() {
 
     gymData.workoutTemplate.forEach(exercise => {
 
-        html += `
-            <div class="exercise-card">
-                <h2>${exercise.name}</h2>
-            </div>
-        `;
+       html += createExerciseCard(exercise);
 
     });
 
@@ -37,6 +33,27 @@ function showManageWorkout() {
     `;
 
     container.innerHTML = html;
+
+document
+    .querySelectorAll(".manage-card")
+    .forEach(card => {
+
+        card.addEventListener("click", () => {
+
+            const id = Number(card.dataset.id);
+
+            const exercise =
+                gymData.workoutTemplate.find(
+                    e => e.id === id
+                );
+
+            alert(
+                `Selected:\n\n${exercise.name}`
+            );
+
+        });
+
+    });
 
     document
         .getElementById("backHome")

@@ -201,3 +201,27 @@ footer {
     margin-bottom: 6px;
 
 }
+
+.manage-card {
+    cursor: pointer;
+}
+
+.exercise-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    color: #666;
+    font-weight: 600;
+}
+
+.exercise-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chevron {
+    font-size: 1.5rem;
+    color: #999;
+}
