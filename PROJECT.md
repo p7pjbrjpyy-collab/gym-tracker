@@ -7,6 +7,7 @@ A simple, fast, offline gym tracking app designed for personal use on an iPhone.
 "I just want something better than Notes on my iPhone."
 
 The app should be:
+
 - Quick to use during a workout
 - One-handed wherever possible
 - Focused on logging workouts, not analysing them during the session
@@ -69,7 +70,6 @@ Sprint 2
 - One-handed operation
 - No unnecessary screens
 
-
 ## Chat Structure
 
 Rather than having one enormous chat for the whole project, I'd suggest we treat it like a real software project.
@@ -96,3 +96,13 @@ The chats stay manageable.
 It's easier to find old discussions.
 If you ever share the project with someone else, the development history is nicely organised.
 
+## Design Principles
+
+- Fast to use
+- One-handed operation
+- Offline first
+- Auto-save whenever possible
+- Large tap targets
+- Better than Notes
+- Five-Tap Rule:
+  A common task should take no more than five taps.

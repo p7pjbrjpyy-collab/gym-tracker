@@ -3,7 +3,6 @@
 // =================================
 
 function createExerciseCard(exercise) {
-
     return `
         <div
             class="exercise-card manage-card"
@@ -34,5 +33,35 @@ function createExerciseCard(exercise) {
 
         </div>
     `;
+}
+
+function showModal(title, content) {
+
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+
+    overlay.innerHTML = `
+        <div class="modal">
+
+            <h2>${title}</h2>
+
+            ${content}
+
+            <button id="closeModal">
+                Close
+            </button>
+
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document
+        .getElementById("closeModal")
+        .addEventListener("click", () => {
+
+            overlay.remove();
+
+        });
 
 }
