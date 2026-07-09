@@ -219,3 +219,21 @@ footer {
 .set-row span {
     font-size: 0.95rem;
 }
+
+/* ==================================
+   Inline Editing
+   ================================== */
+
+.editable-weight {
+    cursor: pointer;
+    color: #007aff;
+}
+
+.inline-edit {
+    width: 100%;
+    border: 2px solid #007aff;
+    border-radius: 8px;
+    padding: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}

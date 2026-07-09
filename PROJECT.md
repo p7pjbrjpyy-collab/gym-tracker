@@ -127,3 +127,8 @@ I think that principle is becoming the thing that makes this project special.
 Edit in place.
 
 Don't take the user somewhere else if they can edit the value where it already is.
+
+-----
+
+The app should understand the exercise, not just display it.
+
