@@ -1,143 +1,83 @@
 // =================================
 // Gym Tracker
-// Version 0.3
-// Workout Screen
+// App Controller
 // =================================
 
+document.addEventListener("DOMContentLoaded", () => {
+    const startWorkoutButton = document.getElementById("startWorkout");
+    const manageWorkoutButton = document.getElementById("manageWorkout");
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+    startWorkoutButton.addEventListener("click", () => {
+        showWorkout();
+    });
 
-        const startWorkoutButton =
-            document.getElementById("startWorkout");
-
-        const manageWorkoutButton =
-            document.getElementById("manageWorkout");
-
-
-        startWorkoutButton.addEventListener(
-            "click",
-            () => {
-
-                showWorkout();
-
-            }
-        );
-
-
-        manageWorkoutButton.addEventListener(
-            "click",
-            () => {
-
-                showManageWorkout();
-
-            }
-        );
-
-    }
-);
-
-
+    manageWorkoutButton.addEventListener("click", () => {
+        showManageWorkout();
+    });
+});
 
 function showWorkout() {
+    const gymData = loadData();
 
+    gymData.activeWorkout = createActiveWorkoutFromTemplate(
+        gymData.workoutTemplate
+    );
 
-    const container =
-        document.querySelector(".container");
+    saveData(gymData);
 
+    const activeWorkout = gymData.activeWorkout;
+
+    const container = document.querySelector(".container");
 
     let workoutHTML = `
-
         <header>
-
             <h1>💪 Today's Workout</h1>
-
             <p class="subtitle">
-                Let's get started James
+                ${activeWorkout.date}
             </p>
-
         </header>
 
         <main>
-
     `;
 
+    activeWorkout.exercises.forEach((exercise) => {
+        workoutHTML += `
+            <div class="exercise-card">
+                <h2>${exercise.name}</h2>
 
+                <p>
+                    <strong>Sets:</strong>
+                    ${exercise.sets.length}
+                </p>
 
-    const gymData = loadData();
+                <p>
+                    <strong>First set:</strong>
+                    ${
+                        exercise.sets[0]
+                            ? `${exercise.sets[0].weight} × ${exercise.sets[0].reps}`
+                            : "Not tracked"
+                    }
+                </p>
 
-const workout = gymData.workoutTemplate;
-
-workout.forEach(
-
-        exercise => {
-
-
-            workoutHTML += `
-
-                <div class="exercise-card">
-
-                    <h2>
-                        ${exercise.name}
-                    </h2>
-
-
-                    <p>
-                        <strong>Target:</strong>
-                        ${exercise.sets} × ${exercise.reps}
-                    </p>
-
-
-                    <p>
-                        <strong>Weight:</strong>
-                        ${exercise.weight}
-                    </p>
-
-
-                    <p>
-                        <strong>Rest:</strong>
-                        ${exercise.rest}
-                    </p>
-
-
-                </div>
-
-            `;
-
-
-        }
-    );
-
-
+                <p>
+                    <strong>Rest:</strong>
+                    ${exercise.rest}
+                </p>
+            </div>
+        `;
+    });
 
     workoutHTML += `
-
         </main>
 
         <button id="backHome">
             ← Back Home
         </button>
-
     `;
 
+    container.innerHTML = workoutHTML;
 
-
-    container.innerHTML =
-        workoutHTML;
-
-
-
-    document
-        .getElementById("backHome")
-        .addEventListener(
-            "click",
-            () => {
-
-                location.reload();
-
-            }
-        );
-
-
+    document.getElementById("backHome").addEventListener("click", () => {
+        location.reload();
+    });
 }

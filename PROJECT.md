@@ -2,6 +2,8 @@
 
 ## Vision
 
+Gym Tracker is a training memory, not just a workout log
+
 A simple, fast, offline gym tracking app designed for personal use on an iPhone.
 
 "I just want something better than Notes on my iPhone."
@@ -105,4 +107,17 @@ If you ever share the project with someone else, the development history is nice
 - Large tap targets
 - Better than Notes
 - Five-Tap Rule:
-  A common task should take no more than five taps.
+- A common task should take no more than five taps.
+  Build for real life, not perfect plans.
+
+Examples:
+
+Garmin instead of a rest timer.
+Different weights on different sets.
+Resume after phone locks.
+Five-Tap Rule.
+Better than Notes.
+
+Those are all driven by what actually happens in the gym.
+
+I think that principle is becoming the thing that makes this project special.
