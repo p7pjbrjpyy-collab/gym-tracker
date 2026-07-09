@@ -26,7 +26,6 @@ function showWorkout() {
     saveData(gymData);
 
     const activeWorkout = gymData.activeWorkout;
-
     const container = document.querySelector(".container");
 
     let workoutHTML = `
@@ -45,19 +44,7 @@ function showWorkout() {
             <div class="exercise-card">
                 <h2>${exercise.name}</h2>
 
-                <p>
-                    <strong>Sets:</strong>
-                    ${exercise.sets.length}
-                </p>
-
-                <p>
-                    <strong>First set:</strong>
-                    ${
-                        exercise.sets[0]
-                            ? `${exercise.sets[0].weight} × ${exercise.sets[0].reps}`
-                            : "Not tracked"
-                    }
-                </p>
+                ${createSetRows(exercise)}
 
                 <p>
                     <strong>Rest:</strong>
@@ -80,4 +67,30 @@ function showWorkout() {
     document.getElementById("backHome").addEventListener("click", () => {
         location.reload();
     });
+}
+
+function createSetRows(exercise) {
+    if (exercise.sets.length === 0) {
+        return `
+            <p>
+                Not tracked
+            </p>
+        `;
+    }
+
+    let setsHTML = `<div class="set-list">`;
+
+    exercise.sets.forEach((set) => {
+        setsHTML += `
+            <div class="set-row">
+                <span>Set ${set.setNumber}</span>
+                <span>${set.weight}</span>
+                <span>${set.reps} reps</span>
+            </div>
+        `;
+    });
+
+    setsHTML += `</div>`;
+
+    return setsHTML;
 }
