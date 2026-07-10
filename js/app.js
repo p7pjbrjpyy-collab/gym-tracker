@@ -19,16 +19,98 @@ document.addEventListener("DOMContentLoaded", () => {
   historyButton.addEventListener("click", () => {
     showHistory();
   });
+
+  updateHomeScreen();
+
 });
+
+function updateHomeScreen() {
+  const gymData = loadData();
+
+  const startWorkoutButton = document.getElementById("startWorkout");
+  const lastWorkoutSection = document.querySelector(".last-workout");
+
+  if (gymData.activeWorkout) {
+    const exerciseCount = gymData.activeWorkout.exercises.length;
+
+    startWorkoutButton.innerHTML = "▶ Resume Workout";
+
+    lastWorkoutSection.innerHTML = `
+      <h2>Workout in Progress</h2>
+
+      <p>
+        Started ${formatActiveWorkoutStart(gymData.activeWorkout)}
+      </p>
+
+      <p>
+        ${exerciseCount} exercises
+      </p>
+    `;
+
+    return;
+  }
+
+  startWorkoutButton.innerHTML = "▶ Start Workout";
+
+  if (gymData.history.length === 0) {
+    lastWorkoutSection.innerHTML = `
+      <h2>Last Workout</h2>
+
+      <p>
+        No workouts recorded yet
+      </p>
+    `;
+
+    return;
+  }
+
+  const lastWorkout = gymData.history[gymData.history.length - 1];
+
+  lastWorkoutSection.innerHTML = `
+    <h2>Last Workout</h2>
+
+    <p>
+      ${formatWorkoutDate(lastWorkout.date)}
+    </p>
+
+    <p>
+      ${lastWorkout.exercises.length} exercises
+    </p>
+  `;
+}
+
+function formatActiveWorkoutStart(activeWorkout) {
+  if (!activeWorkout.startedAt) {
+    return "today";
+  }
+
+  const startedAt = new Date(activeWorkout.startedAt);
+  const today = new Date();
+
+  const isToday =
+    startedAt.getFullYear() === today.getFullYear() &&
+    startedAt.getMonth() === today.getMonth() &&
+    startedAt.getDate() === today.getDate();
+
+  const time = startedAt.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return isToday
+    ? `today at ${time}`
+    : startedAt.toLocaleDateString("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short",
+      });
+}
 
 function showWorkout() {
   const gymData = loadData();
 
-  gymData.activeWorkout = createActiveWorkoutFromTemplate(
-    gymData.workoutTemplate,
-  );
+  startOrResumeActiveWorkout(gymData);
 
-  saveData(gymData);
   renderWorkout();
 }
 
