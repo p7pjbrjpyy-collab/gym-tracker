@@ -6,6 +6,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const startWorkoutButton = document.getElementById("startWorkout");
   const manageWorkoutButton = document.getElementById("manageWorkout");
+  const historyButton = document.getElementById("history");
 
   startWorkoutButton.addEventListener("click", () => {
     showWorkout();
@@ -13,6 +14,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   manageWorkoutButton.addEventListener("click", () => {
     showManageWorkout();
+  });
+
+  historyButton.addEventListener("click", () => {
+    showHistory();
   });
 });
 

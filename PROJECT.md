@@ -100,15 +100,15 @@ If you ever share the project with someone else, the development history is nice
 
 ## Design Principles
 
-- Fast to use
-- One-handed operation
-- Offline first
-- Auto-save whenever possible
-- Large tap targets
 - Better than Notes
-- Five-Tap Rule:
-- A common task should take no more than five taps.
-  Build for real life, not perfect plans.
+- Five Tap Rule
+- No Dead Ends
+- Edit in Place
+- Training Memory
+- Friction should match risk
+- Confirm destructive actions
+- Every screen answers "What next?"
+- Store structured data, not formatted text
 
 Examples:
 
