@@ -4,221 +4,290 @@
 // =================================
 
 document.addEventListener("DOMContentLoaded", () => {
-    const startWorkoutButton = document.getElementById("startWorkout");
-    const manageWorkoutButton = document.getElementById("manageWorkout");
+  const startWorkoutButton = document.getElementById("startWorkout");
+  const manageWorkoutButton = document.getElementById("manageWorkout");
 
-    startWorkoutButton.addEventListener("click", () => {
-        showWorkout();
-    });
+  startWorkoutButton.addEventListener("click", () => {
+    showWorkout();
+  });
 
-    manageWorkoutButton.addEventListener("click", () => {
-        showManageWorkout();
-    });
+  manageWorkoutButton.addEventListener("click", () => {
+    showManageWorkout();
+  });
 });
 
 function showWorkout() {
-    const gymData = loadData();
+  const gymData = loadData();
 
-    gymData.activeWorkout = createActiveWorkoutFromTemplate(
-        gymData.workoutTemplate
-    );
+  gymData.activeWorkout = createActiveWorkoutFromTemplate(
+    gymData.workoutTemplate,
+  );
 
-    saveData(gymData);
+  saveData(gymData);
 
-    renderWorkout();
+  renderWorkout();
 }
 
 function renderWorkout() {
-    const gymData = loadData();
-    const activeWorkout = gymData.activeWorkout;
-    const container = document.querySelector(".container");
+  const gymData = loadData();
+  const activeWorkout = gymData.activeWorkout;
+  const container = document.querySelector(".container");
 
-    let workoutHTML = `
-        <header>
-            <h1>💪 Today's Workout</h1>
-            <p class="subtitle">
-                ${activeWorkout.date}
-            </p>
-        </header>
+  let workoutHTML = `
+    <header>
+      <h1>💪 Today's Workout</h1>
 
-        <main>
-    `;
+      <p class="subtitle">
+        ${activeWorkout.date}
+      </p>
+    </header>
 
-    activeWorkout.exercises.forEach((exercise) => {
-        workoutHTML += `
-            <div class="exercise-card">
-                <h2>${exercise.name}</h2>
+    <main>
+  `;
 
-                ${createSetRows(exercise)}
-
-                <p>
-                    <strong>Rest:</strong>
-                    ${exercise.rest}
-                </p>
-            </div>
-        `;
-    });
-
+  activeWorkout.exercises.forEach((exercise) => {
     workoutHTML += `
-        </main>
+      <div class="exercise-card">
+        <h2>${exercise.name}</h2>
 
-        <button id="backHome">
-            ← Back Home
-        </button>
+        ${createSetRows(exercise)}
+
+        <p>
+          <strong>Rest:</strong>
+          ${exercise.rest}
+        </p>
+      </div>
     `;
+  });
 
-    container.innerHTML = workoutHTML;
+  workoutHTML += `
+    </main>
 
-    document.getElementById("backHome").addEventListener("click", () => {
-        location.reload();
-    });
+    <button id="backHome">
+      ← Back Home
+    </button>
+  `;
 
-    attachWeightValueEditHandlers();
-    attachWeightUnitEditHandlers();
+  container.innerHTML = workoutHTML;
+
+  document.getElementById("backHome").addEventListener("click", () => {
+    location.reload();
+  });
+
+  attachWeightValueEditHandlers();
+  attachWeightUnitEditHandlers();
+  attachRepEditHandlers();
 }
 
 function createSetRows(exercise) {
-    if (exercise.sets.length === 0) {
-        return `
-            <p>
-                Not tracked
-            </p>
-        `;
-    }
+  if (exercise.sets.length === 0) {
+    return `
+      <p>
+        Not tracked
+      </p>
+    `;
+  }
 
-    let setsHTML = `<div class="set-list">`;
+  let setsHTML = `<div class="set-list">`;
 
-    exercise.sets.forEach((set) => {
-        const weightValue = set.weight ? set.weight.value : "-";
-        const weightUnit = set.weight ? set.weight.unit : "";
+  exercise.sets.forEach((set) => {
+    const weightValue = set.weight ? set.weight.value : "-";
+    const weightUnit = set.weight ? set.weight.unit : "";
 
-        setsHTML += `
-            <div class="set-row">
-                <span>Set ${set.setNumber}</span>
+    setsHTML += `
+      <div class="set-row">
+        <span>Set ${set.setNumber}</span>
 
-                <span>
-                    <span
-                        class="editable-weight-value"
-                        data-exercise-id="${exercise.id}"
-                        data-set-number="${set.setNumber}"
-                    >
-                        ${weightValue}
-                    </span>
+        <span class="weight-cell">
+          <span
+            class="editable-weight-value"
+            data-exercise-id="${exercise.id}"
+            data-set-number="${set.setNumber}"
+          >
+            ${weightValue}
+          </span>
 
-                    <span
-                        class="editable-weight-unit"
-                        data-exercise-id="${exercise.id}"
-                        data-set-number="${set.setNumber}"
-                    >
-                        ${weightUnit}
-                    </span>
-                </span>
+          <span
+            class="editable-weight-unit"
+            data-exercise-id="${exercise.id}"
+            data-set-number="${set.setNumber}"
+          >
+            ${weightUnit}
+          </span>
+        </span>
 
-                <span>${set.reps} reps</span>
-            </div>
-        `;
-    });
+        <span class="reps-cell">
+          <span
+            class="editable-reps"
+            data-exercise-id="${exercise.id}"
+            data-set-number="${set.setNumber}"
+          >
+            ${set.reps}
+          </span>
 
-    setsHTML += `</div>`;
+          <span>reps</span>
+        </span>
+      </div>
+    `;
+  });
 
-    return setsHTML;
+  setsHTML += `</div>`;
+
+  return setsHTML;
 }
 
 function attachWeightValueEditHandlers() {
-    document.querySelectorAll(".editable-weight-value").forEach((element) => {
-        element.addEventListener("click", () => {
-            const currentValue = element.innerText.trim();
+  document.querySelectorAll(".editable-weight-value").forEach((element) => {
+    element.addEventListener("click", () => {
+      const currentValue = element.innerText.trim();
 
-            element.innerHTML = `
-                <input
-                    class="inline-edit"
-                    type="text"
-                    value="${currentValue}"
-                >
-            `;
+      element.innerHTML = `
+        <input
+          class="inline-edit"
+          type="text"
+          inputmode="decimal"
+          value="${currentValue}"
+        >
+      `;
 
-            const input = element.querySelector("input");
+      const input = element.querySelector("input");
 
-            input.focus();
-            input.select();
+      input.focus();
+      input.select();
 
-            input.addEventListener("keydown", (event) => {
-                if (event.key === "Enter") {
-                    saveEditedWeightValue(element, input.value);
-                }
-            });
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          saveEditedWeightValue(element, input.value);
+        }
+      });
 
-            input.addEventListener("blur", () => {
-                saveEditedWeightValue(element, input.value);
-            });
-        });
+      input.addEventListener("blur", () => {
+        saveEditedWeightValue(element, input.value);
+      });
     });
+  });
 }
 
 function attachWeightUnitEditHandlers() {
-    document.querySelectorAll(".editable-weight-unit").forEach((element) => {
-        element.addEventListener("click", () => {
-            const currentValue = element.innerText.trim();
+  document.querySelectorAll(".editable-weight-unit").forEach((element) => {
+    element.addEventListener("click", () => {
+      const currentValue = element.innerText.trim();
 
-            element.innerHTML = `
-                <input
-                    class="inline-edit unit-edit"
-                    type="text"
-                    value="${currentValue}"
-                >
-            `;
+      element.innerHTML = `
+        <input
+          class="inline-edit unit-edit"
+          type="text"
+          value="${currentValue}"
+        >
+      `;
 
-            const input = element.querySelector("input");
+      const input = element.querySelector("input");
 
-            input.focus();
-            input.select();
+      input.focus();
+      input.select();
 
-            input.addEventListener("keydown", (event) => {
-                if (event.key === "Enter") {
-                    saveEditedWeightUnit(element, input.value);
-                }
-            });
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          saveEditedWeightUnit(element, input.value);
+        }
+      });
 
-            input.addEventListener("blur", () => {
-                saveEditedWeightUnit(element, input.value);
-            });
-        });
+      input.addEventListener("blur", () => {
+        saveEditedWeightUnit(element, input.value);
+      });
     });
+  });
+}
+
+function attachRepEditHandlers() {
+  document.querySelectorAll(".editable-reps").forEach((element) => {
+    element.addEventListener("click", () => {
+      const currentValue = element.innerText.trim();
+
+      element.innerHTML = `
+        <input
+          class="inline-edit rep-edit"
+          type="text"
+          inputmode="numeric"
+          value="${currentValue}"
+        >
+      `;
+
+      const input = element.querySelector("input");
+
+      input.focus();
+      input.select();
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          saveEditedReps(element, input.value);
+        }
+      });
+
+      input.addEventListener("blur", () => {
+        saveEditedReps(element, input.value);
+      });
+    });
+  });
 }
 
 function saveEditedWeightValue(element, newValue) {
-    const gymData = loadData();
-    const set = findSetFromElement(gymData, element);
+  const gymData = loadData();
+  const set = findSetFromElement(gymData, element);
 
-    set.weight = {
-        value: Number(newValue),
-        unit: set.weight ? set.weight.unit : "kg"
-    };
+  const parsedValue = Number(newValue);
 
-    saveData(gymData);
+  if (Number.isNaN(parsedValue)) {
     renderWorkout();
+    return;
+  }
+
+  set.weight = {
+    value: parsedValue,
+    unit: set.weight ? set.weight.unit : "kg",
+  };
+
+  saveData(gymData);
+  renderWorkout();
 }
 
 function saveEditedWeightUnit(element, newUnit) {
-    const gymData = loadData();
-    const set = findSetFromElement(gymData, element);
+  const gymData = loadData();
+  const set = findSetFromElement(gymData, element);
 
-    set.weight = {
-        value: set.weight ? set.weight.value : 0,
-        unit: newUnit
-    };
+  set.weight = {
+    value: set.weight ? set.weight.value : 0,
+    unit: newUnit.trim(),
+  };
 
-    saveData(gymData);
+  saveData(gymData);
+  renderWorkout();
+}
+
+function saveEditedReps(element, newReps) {
+  const gymData = loadData();
+  const set = findSetFromElement(gymData, element);
+
+  const parsedReps = Number(newReps);
+
+  if (!Number.isInteger(parsedReps) || parsedReps < 0) {
     renderWorkout();
+    return;
+  }
+
+  set.reps = parsedReps;
+
+  saveData(gymData);
+  renderWorkout();
 }
 
 function findSetFromElement(gymData, element) {
-    const exerciseId = Number(element.dataset.exerciseId);
-    const setNumber = Number(element.dataset.setNumber);
+  const exerciseId = Number(element.dataset.exerciseId);
+  const setNumber = Number(element.dataset.setNumber);
 
-    const exercise = gymData.activeWorkout.exercises.find(
-        (item) => item.id === exerciseId
-    );
+  const exercise = gymData.activeWorkout.exercises.find(
+    (item) => item.id === exerciseId,
+  );
 
-    return exercise.sets.find((item) => item.setNumber === setNumber);
+  return exercise.sets.find((item) => item.setNumber === setNumber);
 }

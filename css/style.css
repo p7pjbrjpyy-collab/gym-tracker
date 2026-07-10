@@ -200,24 +200,24 @@ footer {
    ================================== */
 
 .set-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0;
 }
 
 .set-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-    padding: 10px;
-    background: white;
-    border-radius: 10px;
-    font-weight: 600;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 10px;
+  background: white;
+  border-radius: 10px;
+  font-weight: 600;
 }
 
 .set-row span {
-    font-size: 0.95rem;
+  font-size: 0.95rem;
 }
 
 /* ==================================
@@ -225,15 +225,46 @@ footer {
    ================================== */
 
 .editable-weight {
-    cursor: pointer;
-    color: #007aff;
+  cursor: pointer;
+  color: #007aff;
 }
 
 .inline-edit {
-    width: 100%;
-    border: 2px solid #007aff;
-    border-radius: 8px;
-    padding: 6px;
-    font-size: 0.95rem;
-    font-weight: 600;
+  width: 100%;
+  border: 2px solid #007aff;
+  border-radius: 8px;
+  padding: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.weight-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.editable-weight-value {
+  display: inline-flex;
+}
+
+.weight-cell .inline-edit {
+  width: 4.5rem;
+}
+
+.reps-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.editable-reps {
+  cursor: pointer;
+  color: #007aff;
+}
+
+.rep-edit {
+  width: 3.5rem;
 }
