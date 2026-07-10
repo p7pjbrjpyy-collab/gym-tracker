@@ -268,3 +268,28 @@ footer {
 .rep-edit {
   width: 3.5rem;
 }
+
+/* ==================================
+   Button Variants
+   ================================== */
+
+.button-primary {
+  background: #007aff;
+  color: white;
+}
+
+.button-success {
+  background: #34c759;
+  color: white;
+}
+
+.button-danger {
+  background: #ff3b30;
+  color: white;
+}
+
+.button-secondary {
+  background: #e9e9ed;
+  color: #1d1d1f;
+}
+

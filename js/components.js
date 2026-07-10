@@ -35,33 +35,27 @@ function createExerciseCard(exercise) {
     `;
 }
 
-function showModal(title, content) {
+function showModal(title, content, closeLabel = "Close") {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
 
-    const overlay = document.createElement("div");
-    overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal">
+      <h2>${title}</h2>
 
-    overlay.innerHTML = `
-        <div class="modal">
+      ${content}
 
-            <h2>${title}</h2>
+      <button class="button-secondary" id="closeModal">
+        ${closeLabel}
+      </button>
+    </div>
+  `;
 
-            ${content}
+  document.body.appendChild(overlay);
 
-            <button id="closeModal">
-                Close
-            </button>
+  document.getElementById("closeModal").addEventListener("click", () => {
+    overlay.remove();
+  });
 
-        </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    document
-        .getElementById("closeModal")
-        .addEventListener("click", () => {
-
-            overlay.remove();
-
-        });
-
+  return overlay;
 }

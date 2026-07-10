@@ -132,3 +132,5 @@ Don't take the user somewhere else if they can edit the value where it already i
 
 The app should understand the exercise, not just display it.
 
+Every screen should answer the question: "What do I do next?"
+

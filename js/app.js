@@ -24,7 +24,6 @@ function showWorkout() {
   );
 
   saveData(gymData);
-
   renderWorkout();
 }
 
@@ -61,18 +60,25 @@ function renderWorkout() {
   });
 
   workoutHTML += `
-    </main>
+      <button class="button-success" id="completeWorkout">
+        ✅ Complete Workout
+      </button>
 
-    <button id="backHome">
-      ← Back Home
-    </button>
+      <button class="button-secondary" id="returnHome">
+        🏠 Return Home
+      </button>
+    </main>
   `;
 
   container.innerHTML = workoutHTML;
 
-  document.getElementById("backHome").addEventListener("click", () => {
-    location.reload();
-  });
+  document
+    .getElementById("completeWorkout")
+    .addEventListener("click", showCompleteWorkoutModal);
+
+  document
+    .getElementById("returnHome")
+    .addEventListener("click", showDiscardWorkoutModal);
 
   attachWeightValueEditHandlers();
   attachWeightUnitEditHandlers();
@@ -134,6 +140,87 @@ function createSetRows(exercise) {
   setsHTML += `</div>`;
 
   return setsHTML;
+}
+
+function showCompleteWorkoutModal() {
+  const gymData = loadData();
+  const exerciseCount = gymData.activeWorkout.exercises.length;
+
+  const overlay = showModal(
+    "🏁 Complete Workout",
+    `
+      <p>
+        You are about to complete today's workout.
+      </p>
+
+      <p>
+        <strong>${exerciseCount} exercises</strong> will be saved to your
+        workout history.
+      </p>
+
+      <button class="button-success" id="confirmCompleteWorkout">
+        ✅ Complete Workout
+      </button>
+    `,
+    "Keep Training",
+  );
+
+  document
+    .getElementById("confirmCompleteWorkout")
+    .addEventListener("click", () => {
+      completeActiveWorkout();
+
+      overlay.remove();
+      location.reload();
+    });
+}
+
+function showDiscardWorkoutModal() {
+  const overlay = showModal(
+    "Discard Workout?",
+    `
+      <p>
+        Your changes from this workout will be lost.
+      </p>
+
+      <button class="button-danger" id="confirmDiscardWorkout">
+        Discard Workout
+      </button>
+    `,
+    "Continue Workout",
+  );
+
+  document
+    .getElementById("confirmDiscardWorkout")
+    .addEventListener("click", () => {
+      discardActiveWorkout();
+
+      overlay.remove();
+      location.reload();
+    });
+}
+
+function completeActiveWorkout() {
+  const gymData = loadData();
+
+  if (!gymData.activeWorkout) {
+    return;
+  }
+
+  gymData.activeWorkout.completedAt = new Date().toISOString();
+
+  gymData.history.push(gymData.activeWorkout);
+  gymData.activeWorkout = null;
+
+  saveData(gymData);
+}
+
+function discardActiveWorkout() {
+  const gymData = loadData();
+
+  gymData.activeWorkout = null;
+
+  saveData(gymData);
 }
 
 function attachWeightValueEditHandlers() {
@@ -234,7 +321,6 @@ function attachRepEditHandlers() {
 function saveEditedWeightValue(element, newValue) {
   const gymData = loadData();
   const set = findSetFromElement(gymData, element);
-
   const parsedValue = Number(newValue);
 
   if (Number.isNaN(parsedValue)) {
@@ -267,7 +353,6 @@ function saveEditedWeightUnit(element, newUnit) {
 function saveEditedReps(element, newReps) {
   const gymData = loadData();
   const set = findSetFromElement(gymData, element);
-
   const parsedReps = Number(newReps);
 
   if (!Number.isInteger(parsedReps) || parsedReps < 0) {
