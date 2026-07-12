@@ -8,9 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const manageWorkoutButton = document.getElementById("manageWorkout");
   const historyButton = document.getElementById("history");
 
-  startWorkoutButton.addEventListener("click", () => {
-    showWorkout();
-  });
+startWorkoutButton.addEventListener("click", () => {
+  showNewWorkoutModal();
+});
 
   manageWorkoutButton.addEventListener("click", () => {
     showManageWorkout();
@@ -74,7 +74,7 @@ document
     return;
   }
 
-  startWorkoutButton.innerHTML = "▶ Start Workout";
+  startWorkoutButton.innerHTML = "▶ New Workout";
 
   if (gymData.history.length === 0) {
     lastWorkoutSection.innerHTML = `
@@ -171,6 +171,58 @@ function formatLastUpdated(activeWorkout) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function showNewWorkoutModal() {
+  const overlay = showModal(
+    "🏋️ New Workout",
+    `
+      <p>
+        Start today's workout
+      </p>
+
+      <button
+        class="button-secondary"
+        id="repeatWorkout"
+      >
+        🔁 Repeat Last Workout
+      </button>
+
+      <button
+        class="button-secondary"
+        id="useTemplate"
+      >
+        📋 Use Template
+      </button>
+
+      <button
+        class="button-secondary"
+        id="blankWorkout"
+      >
+        ➕ Blank Workout
+      </button>
+    `,
+    "Cancel",
+  );
+
+  document
+    .getElementById("useTemplate")
+    .addEventListener("click", () => {
+      overlay.remove();
+      showWorkout();
+    });
+
+  document
+    .getElementById("repeatWorkout")
+    .addEventListener("click", () => {
+      alert("Coming in Sprint 3.0B 🚀");
+    });
+
+  document
+    .getElementById("blankWorkout")
+    .addEventListener("click", () => {
+      alert("Coming in Sprint 3.0C 🚀");
+    });
 }
 
 function showWorkout() {
