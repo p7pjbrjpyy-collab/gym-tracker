@@ -35,18 +35,42 @@ function updateHomeScreen() {
 
     startWorkoutButton.innerHTML = "▶ Resume Workout";
 
-    lastWorkoutSection.innerHTML = `
-      <h2>Workout in Progress</h2>
+   lastWorkoutSection.innerHTML = `
+  <div
+    class="exercise-card manage-card"
+    id="lastWorkoutCard"
+  >
+    <div class="exercise-title">
 
-      <p>
-        Started ${formatActiveWorkoutStart(gymData.activeWorkout)}
-      </p>
+      <h2>Last Workout</h2>
 
-      <p>
-        ${exerciseCount} exercises
-      </p>
-    `;
+      <span class="chevron">
+        ›
+      </span>
 
+    </div>
+
+    <div class="exercise-summary">
+
+      <span>
+        ${formatWorkoutDate(lastWorkout.date)}
+      </span>
+
+      <span>
+        ${lastWorkout.exercises.length} exercises
+      </span>
+
+    </div>
+  </div>
+`;
+
+document
+  .getElementById("lastWorkoutCard")
+  ?.addEventListener("click", () => {
+
+    showWorkoutHistoryDetail(lastWorkout.id);
+
+  })
     return;
   }
 
@@ -67,7 +91,19 @@ function updateHomeScreen() {
   const lastWorkout = gymData.history[gymData.history.length - 1];
 
   lastWorkoutSection.innerHTML = `
-    <h2>Last Workout</h2>
+  <div
+    class="last-workout-card"
+    id="lastWorkoutCard"
+    role="button"
+    tabindex="0"
+  >
+    <div class="exercise-title">
+      <h2>Last Workout</h2>
+
+      <span class="chevron">
+        ›
+      </span>
+    </div>
 
     <p>
       ${formatWorkoutDate(lastWorkout.date)}
@@ -76,7 +112,25 @@ function updateHomeScreen() {
     <p>
       ${lastWorkout.exercises.length} exercises
     </p>
-  `;
+
+    <p class="view-workout-text">
+      View Workout
+    </p>
+  </div>
+`;
+
+const lastWorkoutCard = document.getElementById("lastWorkoutCard");
+
+lastWorkoutCard.addEventListener("click", () => {
+  showWorkoutHistoryDetail(lastWorkout.id);
+});
+
+lastWorkoutCard.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    showWorkoutHistoryDetail(lastWorkout.id);
+  }
+});
 }
 
 function formatActiveWorkoutStart(activeWorkout) {
@@ -104,6 +158,19 @@ function formatActiveWorkoutStart(activeWorkout) {
         day: "numeric",
         month: "short",
       });
+}
+
+function formatLastUpdated(activeWorkout) {
+  if (!activeWorkout.updatedAt) {
+    return "just now";
+  }
+
+  const updated = new Date(activeWorkout.updatedAt);
+
+  return updated.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 function showWorkout() {
@@ -420,7 +487,11 @@ function saveEditedWeightValue(element, newValue) {
     unit: set.weight ? set.weight.unit : "kg",
   };
 
-  saveData(gymData);
+
+
+updateActiveWorkoutTimestamp(gymData);
+
+saveData(gymData);
   renderWorkout();
 }
 
@@ -433,6 +504,7 @@ function saveEditedWeightUnit(element, newUnit) {
     unit: newUnit.trim(),
   };
 
+  updateActiveWorkoutTimestamp(gymData);
   saveData(gymData);
   renderWorkout();
 }
@@ -449,8 +521,13 @@ function saveEditedReps(element, newReps) {
 
   set.reps = parsedReps;
 
+  updateActiveWorkoutTimestamp(gymData);
   saveData(gymData);
   renderWorkout();
+}
+
+function updateActiveWorkoutTimestamp(gymData) {
+  gymData.activeWorkout.updatedAt = new Date().toISOString();
 }
 
 function findSetFromElement(gymData, element) {

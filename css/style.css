@@ -293,3 +293,25 @@ footer {
   color: #1d1d1f;
 }
 
+/* ==================================
+   Home Dashboard
+   ================================== */
+
+.last-workout-card {
+  cursor: pointer;
+}
+
+.last-workout-card:active {
+  transform: scale(0.99);
+}
+
+.last-workout-card:focus-visible {
+  outline: 3px solid #007aff;
+  outline-offset: 4px;
+}
+
+.view-workout-text {
+  margin-top: 12px;
+  color: #007aff;
+  font-weight: 600;
+}

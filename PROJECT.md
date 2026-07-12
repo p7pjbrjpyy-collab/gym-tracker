@@ -17,6 +17,23 @@ The app should be:
 - Entirely offline with local storage
 - Backed up via Export/Import
 
+
+# Gym Tracker
+
+A fast, flexible workout journal that adapts to how you actually train.
+
+## Every feature must satisfy at least one of these:
+
+✓ Makes today's workout easier
+
+✓ Reduces taps
+
+✓ Reduces thinking
+
+✓ Increases confidence
+
+✓ Works in a real gym
+
 ---
 
 ## Current Version
@@ -98,17 +115,15 @@ The chats stay manageable.
 It's easier to find old discussions.
 If you ever share the project with someone else, the development history is nicely organised.
 
-## Design Principles
+## Core Principles
 
 - Better than Notes
 - Five Tap Rule
 - No Dead Ends
-- Edit in Place
-- Training Memory
-- Friction should match risk
-- Confirm destructive actions
-- Every screen answers "What next?"
-- Store structured data, not formatted text
+- Reduce effort, increase confidence
+- Temporary changes stay temporary
+- Build workouts around the user, not around the template
+- Every workout starts with a choice
 
 Examples:
 
@@ -134,3 +149,4 @@ The app should understand the exercise, not just display it.
 
 Every screen should answer the question: "What do I do next?"
 
+Reduce effort. Increase confidence.
