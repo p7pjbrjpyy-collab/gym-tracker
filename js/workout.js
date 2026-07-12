@@ -36,6 +36,48 @@ function createActiveWorkoutFromTemplate(workoutTemplate) {
   };
 }
 
+function createActiveWorkoutFromWorkout(workout) {
+    return {
+        id: Date.now(),
+        date: new Date().toISOString().split("T")[0],
+        updatedAt: new Date().toISOString(),
+
+        exercises: workout.exercises.map((exercise) => {
+            return {
+                id: exercise.id,
+                name: exercise.name,
+                rest: exercise.rest,
+                coachNote: exercise.coachNote || "",
+
+                sets: exercise.sets.map((set) => {
+                    return {
+                        setNumber: set.setNumber,
+
+                        weight: set.weight
+                            ? {
+                                  value: set.weight.value,
+                                  unit: set.weight.unit
+                              }
+                            : null,
+
+                        reps: set.reps
+                    };
+                })
+            };
+        })
+    };
+}
+
+function createBlankWorkout() {
+    return {
+        id: Date.now(),
+        date: new Date().toISOString().split("T")[0],
+        updatedAt: new Date().toISOString(),
+
+        exercises: []
+    };
+}
+
 function createSetsForExercise(exercise) {
   const numberOfSets = Number(exercise.sets);
 

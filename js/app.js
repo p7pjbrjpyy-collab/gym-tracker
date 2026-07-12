@@ -213,15 +213,60 @@ function showNewWorkoutModal() {
     });
 
   document
-    .getElementById("repeatWorkout")
-    .addEventListener("click", () => {
-      alert("Coming in Sprint 3.0B 🚀");
-    });
+  .getElementById("repeatWorkout")
+  .addEventListener("click", () => {
+
+    const gymData = loadData();
+
+    if (gymData.history.length === 0) {
+
+      overlay.remove();
+
+      showModal(
+        "No Previous Workout",
+        `
+          <p>
+            You haven't completed a workout yet.
+          </p>
+
+          <p>
+            Complete your first workout before using
+            Repeat Last Workout.
+          </p>
+        `
+      );
+
+      return;
+    }
+
+    const lastWorkout =
+      gymData.history[gymData.history.length - 1];
+
+    gymData.activeWorkout =
+      createActiveWorkoutFromWorkout(lastWorkout);
+
+    saveData(gymData);
+
+    overlay.remove();
+
+    renderWorkout();
+
+  });
 
   document
     .getElementById("blankWorkout")
     .addEventListener("click", () => {
-      alert("Coming in Sprint 3.0C 🚀");
+
+        const gymData = loadData();
+
+        gymData.activeWorkout = createBlankWorkout();
+
+        saveData(gymData);
+
+        overlay.remove();
+
+        renderWorkout();
+
     });
 }
 
@@ -250,6 +295,22 @@ function renderWorkout() {
     <main>
   `;
 
+if (activeWorkout.exercises.length === 0) {
+    workoutHTML += `
+        <div class="exercise-card">
+            <h2>No exercises yet</h2>
+
+            <p>
+                Add your first exercise to begin today's workout.
+            </p>
+
+            <button id="addExercise">
+                ➕ Add Exercise
+            </button>
+        </div>
+    `;
+}
+  
   activeWorkout.exercises.forEach((exercise) => {
     workoutHTML += `
       <div class="exercise-card">
@@ -277,6 +338,26 @@ function renderWorkout() {
   `;
 
   container.innerHTML = workoutHTML;
+
+const addExerciseButton =
+    document.getElementById("addExercise");
+
+if (addExerciseButton) {
+
+    addExerciseButton.addEventListener("click", () => {
+
+        showModal(
+            "Sprint 3.0D",
+            `
+                <p>
+                    Add Exercise will be built in the next sprint.
+                </p>
+            `
+        );
+
+    });
+
+}
 
   document
     .getElementById("completeWorkout")
@@ -350,6 +431,21 @@ function createSetRows(exercise) {
 
 function showCompleteWorkoutModal() {
   const gymData = loadData();
+if (
+  !gymData.activeWorkout ||
+  gymData.activeWorkout.exercises.length === 0
+) {
+  showModal(
+    "Nothing to Complete",
+    `
+      <p>
+        Add at least one exercise before completing this workout.
+      </p>
+    `,
+  );
+
+  return;
+}
   const exerciseCount = gymData.activeWorkout.exercises.length;
 
   const overlay = showModal(
