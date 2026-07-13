@@ -53,6 +53,12 @@ function showModal(title, content, closeLabel = "Close") {
 
   document.body.appendChild(overlay);
 
+  overlay.addEventListener("click", (event) => {
+  if (event.target === overlay) {
+    overlay.remove();
+  }
+});
+
   document.getElementById("closeModal").addEventListener("click", () => {
     overlay.remove();
   });

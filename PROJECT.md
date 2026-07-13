@@ -16,6 +16,7 @@ The app should be:
 - Able to resume if the phone locks
 - Entirely offline with local storage
 - Backed up via Export/Import
+- Every tap should either save time or add value.
 
 
 # Gym Tracker
@@ -150,3 +151,20 @@ The app should understand the exercise, not just display it.
 Every screen should answer the question: "What do I do next?"
 
 Reduce effort. Increase confidence.
+
+-----
+
+I think we've accidentally discovered the app's personality
+
+Most gym apps seem to say:
+
+"Look how much data we can collect."
+
+I think Gym Tracker says:
+
+"Let's get you training."
+
+That's a very different product.
+
+-----
+

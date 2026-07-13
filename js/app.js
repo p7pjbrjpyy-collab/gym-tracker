@@ -9,6 +9,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const historyButton = document.getElementById("history");
 
 startWorkoutButton.addEventListener("click", () => {
+  const gymData = loadData();
+
+  if (gymData.activeWorkout) {
+    renderWorkout();
+    return;
+  }
+
   showNewWorkoutModal();
 });
 
@@ -319,9 +326,15 @@ if (activeWorkout.exercises.length === 0) {
         ${createSetRows(exercise)}
 
         <p>
-          <strong>Rest:</strong>
-          ${exercise.rest}
-        </p>
+  <strong>Rest:</strong>
+
+  <span
+    class="editable-rest"
+    data-exercise-id="${exercise.id}"
+  >
+    ${exercise.rest}
+  </span>
+</p>
       </div>
     `;
   });
@@ -346,14 +359,7 @@ if (addExerciseButton) {
 
     addExerciseButton.addEventListener("click", () => {
 
-        showModal(
-            "Sprint 3.0D",
-            `
-                <p>
-                    Add Exercise will be built in the next sprint.
-                </p>
-            `
-        );
+        showAddExerciseModal();
 
     });
 
@@ -370,6 +376,67 @@ if (addExerciseButton) {
   attachWeightValueEditHandlers();
   attachWeightUnitEditHandlers();
   attachRepEditHandlers();
+  attachRestEditHandlers();
+  attachSetButtons();
+}
+
+function attachSetButtons() {
+  document.querySelectorAll(".add-set").forEach((button) => {
+    button.addEventListener("click", () => {
+      const gymData = loadData();
+      const exerciseId = Number(button.dataset.exerciseId);
+
+      const exercise = gymData.activeWorkout.exercises.find(
+        (item) => item.id === exerciseId,
+      );
+
+      const lastSet = exercise.sets[exercise.sets.length - 1];
+
+      exercise.sets.push({
+        setNumber: lastSet.setNumber + 1,
+        weight: lastSet.weight
+          ? {
+              value: lastSet.weight.value,
+              unit: lastSet.weight.unit,
+            }
+          : null,
+        reps: lastSet.reps,
+      });
+
+      updateActiveWorkoutTimestamp(gymData);
+      saveData(gymData);
+      renderWorkout();
+    });
+  });
+
+  document.querySelectorAll(".remove-set").forEach((button) => {
+    button.addEventListener("click", () => {
+      const gymData = loadData();
+      const exerciseId = Number(button.dataset.exerciseId);
+
+      const exercise = gymData.activeWorkout.exercises.find(
+        (item) => item.id === exerciseId,
+      );
+
+      if (exercise.sets.length <= 1) {
+        showModal(
+          "Can't Remove Set",
+          `
+            <p>
+              An exercise must contain at least one set.
+            </p>
+          `,
+        );
+        return;
+      }
+
+      exercise.sets.pop();
+
+      updateActiveWorkoutTimestamp(gymData);
+      saveData(gymData);
+      renderWorkout();
+    });
+  });
 }
 
 function createSetRows(exercise) {
@@ -425,6 +492,26 @@ function createSetRows(exercise) {
   });
 
   setsHTML += `</div>`;
+
+setsHTML += `
+  <div class="set-actions">
+
+    <button
+      class="small-button add-set"
+      data-exercise-id="${exercise.id}"
+    >
+      ➕ Add Set
+    </button>
+
+    <button
+      class="small-button remove-set"
+      data-exercise-id="${exercise.id}"
+    >
+      ➖ Remove Last Set
+    </button>
+
+  </div>
+`;
 
   return setsHTML;
 }
@@ -500,6 +587,87 @@ function showDiscardWorkoutModal() {
       overlay.remove();
       location.reload();
     });
+}
+
+function showAddExerciseModal() {
+  const overlay = showModal(
+    "➕ Add Exercise",
+    `
+      <label class="form-label">
+        Exercise Name
+
+        <input
+          id="exerciseName"
+          class="inline-edit"
+          type="text"
+          placeholder="e.g. Face Pull"
+        >
+      </label>
+
+      <p
+        id="exerciseNameError"
+        class="form-error"
+        hidden
+      >
+        Please enter an exercise name.
+      </p>
+
+      <button
+        class="button-success"
+        id="nextExerciseStep"
+      >
+        Add Exercise
+      </button>
+    `,
+    "Cancel",
+  );
+
+  const exerciseNameInput = document.getElementById("exerciseName");
+  const exerciseNameError = document.getElementById("exerciseNameError");
+  const nextButton = document.getElementById("nextExerciseStep");
+
+  exerciseNameInput.focus();
+
+  exerciseNameInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      nextButton.click();
+    }
+  });
+
+  nextButton.addEventListener("click", () => {
+    const exerciseName = exerciseNameInput.value
+      .trim()
+      .replace(/\s+/g, " ");
+
+    if (!exerciseName) {
+      exerciseNameError.hidden = false;
+      exerciseNameInput.focus();
+      return;
+    }
+
+    exerciseNameError.hidden = true;
+    nextButton.disabled = true;
+
+    overlay.remove();
+    showExerciseDetailsModal(exerciseName);
+  });
+}
+
+function showExerciseDetailsModal(exerciseName) {
+
+    const gymData = loadData();
+
+    const exercise = createExercise(exerciseName);
+
+    gymData.activeWorkout.exercises.push(exercise);
+
+    updateActiveWorkoutTimestamp(gymData);
+
+    saveData(gymData);
+
+    renderWorkout();
+
 }
 
 function completeActiveWorkout() {
@@ -620,26 +788,82 @@ function attachRepEditHandlers() {
   });
 }
 
+function attachRestEditHandlers() {
+  document.querySelectorAll(".editable-rest").forEach((element) => {
+    element.addEventListener("click", () => {
+      const currentValue = element.innerText.trim();
+
+      element.innerHTML = `
+        <input
+          class="inline-edit"
+          type="text"
+          value="${currentValue}"
+        >
+      `;
+
+      const input = element.querySelector("input");
+
+      input.focus();
+      input.select();
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          saveEditedRest(element, input.value);
+        }
+      });
+
+      input.addEventListener("blur", () => {
+        saveEditedRest(element, input.value);
+      });
+    });
+  });
+}
 function saveEditedWeightValue(element, newValue) {
   const gymData = loadData();
-  const set = findSetFromElement(gymData, element);
+
+  const exerciseId = Number(element.dataset.exerciseId);
+  const setNumber = Number(element.dataset.setNumber);
+
+  const exercise = gymData.activeWorkout.exercises.find(
+    (item) => item.id === exerciseId,
+  );
+
+  const set = exercise.sets.find(
+    (item) => item.setNumber === setNumber,
+  );
+
   const parsedValue = Number(newValue);
 
-  if (Number.isNaN(parsedValue)) {
+  if (Number.isNaN(parsedValue) || parsedValue < 0) {
     renderWorkout();
     return;
   }
 
+  const previousValue = set.weight ? set.weight.value : 0;
+  const unit = set.weight ? set.weight.unit : "kg";
+
   set.weight = {
     value: parsedValue,
-    unit: set.weight ? set.weight.unit : "kg",
+    unit,
   };
 
+  if (setNumber === 1) {
+    exercise.sets.forEach((otherSet) => {
+      if (
+        otherSet.setNumber !== 1 &&
+        otherSet.weight &&
+        otherSet.weight.value === previousValue
+      ) {
+        otherSet.weight = {
+          value: parsedValue,
+          unit: otherSet.weight.unit || unit,
+        };
+      }
+    });
+  }
 
-
-updateActiveWorkoutTimestamp(gymData);
-
-saveData(gymData);
+  updateActiveWorkoutTimestamp(gymData);
+  saveData(gymData);
   renderWorkout();
 }
 
@@ -671,6 +895,24 @@ function saveEditedReps(element, newReps) {
 
   updateActiveWorkoutTimestamp(gymData);
   saveData(gymData);
+  renderWorkout();
+}
+
+function saveEditedRest(element, newRest) {
+  const gymData = loadData();
+
+  const exerciseId = Number(element.dataset.exerciseId);
+
+  const exercise = gymData.activeWorkout.exercises.find(
+    (item) => item.id === exerciseId,
+  );
+
+  exercise.rest = newRest.trim();
+
+  updateActiveWorkoutTimestamp(gymData);
+
+  saveData(gymData);
+
   renderWorkout();
 }
 

@@ -78,6 +78,45 @@ function createBlankWorkout() {
     };
 }
 
+function createExercise(name) {
+    return {
+        id: Date.now(),
+
+        name,
+
+        rest: "60 sec",
+
+        coachNote: "",
+
+        sets: [
+            {
+                setNumber: 1,
+                weight: {
+                    value: 0,
+                    unit: "kg"
+                },
+                reps: 12
+            },
+            {
+                setNumber: 2,
+                weight: {
+                    value: 0,
+                    unit: "kg"
+                },
+                reps: 12
+            },
+            {
+                setNumber: 3,
+                weight: {
+                    value: 0,
+                    unit: "kg"
+                },
+                reps: 12
+            }
+        ]
+    };
+}
+
 function createSetsForExercise(exercise) {
   const numberOfSets = Number(exercise.sets);
 
