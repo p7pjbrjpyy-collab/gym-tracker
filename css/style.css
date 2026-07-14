@@ -341,3 +341,16 @@ footer {
   font-size: 0.9rem;
 }
 
+.exercise-menu-button {
+  width: auto;
+  padding: 4px 10px;
+  background: transparent;
+  font-size: 1.5rem;
+}
+
+.exercise-menu-button:disabled,
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+

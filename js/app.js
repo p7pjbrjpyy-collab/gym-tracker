@@ -303,43 +303,56 @@ function renderWorkout() {
   `;
 
 if (activeWorkout.exercises.length === 0) {
-    workoutHTML += `
-        <div class="exercise-card">
-            <h2>No exercises yet</h2>
+  workoutHTML += `
+    <div class="exercise-card">
+      <h2>No exercises yet</h2>
 
-            <p>
-                Add your first exercise to begin today's workout.
-            </p>
-
-            <button id="addExercise">
-                ➕ Add Exercise
-            </button>
-        </div>
-    `;
+      <p>
+        Add your first exercise to begin today's workout.
+      </p>
+    </div>
+  `;
 }
   
   activeWorkout.exercises.forEach((exercise) => {
-    workoutHTML += `
-      <div class="exercise-card">
+  workoutHTML += `
+    <div
+      class="exercise-card active-exercise-card"
+      data-exercise-id="${exercise.id}"
+    >
+      <div class="exercise-title">
         <h2>${exercise.name}</h2>
 
-        ${createSetRows(exercise)}
-
-        <p>
-  <strong>Rest:</strong>
-
-  <span
-    class="editable-rest"
-    data-exercise-id="${exercise.id}"
-  >
-    ${exercise.rest}
-  </span>
-</p>
+        <button
+          class="exercise-menu-button"
+          data-exercise-id="${exercise.id}"
+          aria-label="Reorder ${exercise.name}"
+        >
+          ⋯
+        </button>
       </div>
-    `;
-  });
+
+      ${createSetRows(exercise)}
+
+      <p>
+        <strong>Rest:</strong>
+
+        <span
+          class="editable-rest"
+          data-exercise-id="${exercise.id}"
+        >
+          ${exercise.rest}
+        </span>
+      </p>
+    </div>
+  `;
+});
 
   workoutHTML += `
+      <button class="button-primary" id="addExercise">
+        ➕ Add Exercise
+      </button>
+
       <button class="button-success" id="completeWorkout">
         ✅ Complete Workout
       </button>
@@ -378,6 +391,100 @@ if (addExerciseButton) {
   attachRepEditHandlers();
   attachRestEditHandlers();
   attachSetButtons();
+  attachExerciseMenuHandlers();
+}
+
+function attachExerciseMenuHandlers() {
+  document
+    .querySelectorAll(".exercise-menu-button")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const exerciseId = Number(button.dataset.exerciseId);
+
+        showActiveExerciseMenu(exerciseId);
+      });
+    });
+}
+
+function showActiveExerciseMenu(exerciseId) {
+  const gymData = loadData();
+
+  const exerciseIndex =
+    gymData.activeWorkout.exercises.findIndex(
+      (exercise) => exercise.id === exerciseId,
+    );
+
+  const exercise =
+    gymData.activeWorkout.exercises[exerciseIndex];
+
+  const isFirst = exerciseIndex === 0;
+  const isLast =
+    exerciseIndex ===
+    gymData.activeWorkout.exercises.length - 1;
+
+  const overlay = showModal(
+    `Edit ${exercise.name}`,
+    `
+      <button
+        class="button-secondary"
+        id="moveExerciseUp"
+        ${isFirst ? "disabled" : ""}
+      >
+        ⬆️ Move Up
+      </button>
+
+      <button
+        class="button-secondary"
+        id="moveExerciseDown"
+        ${isLast ? "disabled" : ""}
+      >
+        ⬇️ Move Down
+      </button>
+    `,
+    "Close",
+  );
+
+  document
+    .getElementById("moveExerciseUp")
+    .addEventListener("click", () => {
+      overlay.remove();
+      moveActiveExercise(exerciseId, -1);
+    });
+
+  document
+    .getElementById("moveExerciseDown")
+    .addEventListener("click", () => {
+      overlay.remove();
+      moveActiveExercise(exerciseId, 1);
+    });
+}
+
+function moveActiveExercise(exerciseId, direction) {
+  const gymData = loadData();
+  const exercises = gymData.activeWorkout.exercises;
+
+  const currentIndex = exercises.findIndex(
+    (exercise) => exercise.id === exerciseId,
+  );
+
+  const newIndex = currentIndex + direction;
+
+  if (
+    currentIndex === -1 ||
+    newIndex < 0 ||
+    newIndex >= exercises.length
+  ) {
+    return;
+  }
+
+  [exercises[currentIndex], exercises[newIndex]] = [
+    exercises[newIndex],
+    exercises[currentIndex],
+  ];
+
+  updateActiveWorkoutTimestamp(gymData);
+  saveData(gymData);
+  renderWorkout();
 }
 
 function attachSetButtons() {
