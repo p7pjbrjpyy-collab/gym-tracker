@@ -280,11 +280,18 @@ function showHistoryWorkoutEditor(workoutId) {
       `;
     });
 
-    html += `
+       html += `
         </div>
 
         <p>
-          <strong>Rest:</strong> ${exercise.rest}
+          <strong>Rest:</strong>
+          <input
+            class="inline-edit history-rest"
+            type="text"
+            data-exercise-index="${exerciseIndex}"
+            value="${exercise.rest ?? ""}"
+            aria-label="Rest period for ${exercise.name}"
+          >
         </p>
       </div>
     `;
@@ -343,6 +350,15 @@ function showHistoryWorkoutEditor(workoutId) {
       input.setCustomValidity("");
 
       draftWorkout.exercises[exerciseIndex].sets[setIndex].reps = value;
+    });
+  });
+
+  document.querySelectorAll(".history-rest").forEach((input) => {
+    input.addEventListener("input", () => {
+      const exerciseIndex = Number(input.dataset.exerciseIndex);
+
+      draftWorkout.exercises[exerciseIndex].rest =
+        input.value;
     });
   });
 
