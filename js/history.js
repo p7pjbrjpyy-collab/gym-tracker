@@ -327,7 +327,15 @@ function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
     `;
   });
 
-  html += `
+ html += `
+      <button
+        class="button-primary"
+        id="addHistoryExercise"
+        type="button"
+      >
+        ➕ Add Exercise
+      </button>
+
       <button class="button-success" id="saveHistoryChanges">
         Save Changes
       </button>
@@ -451,6 +459,100 @@ document.querySelectorAll(".history-remove-exercise").forEach((button) => {
     renderHistoryWorkoutDraft(workoutId, draftWorkout);
   });
 });
+
+document.getElementById("addHistoryExercise")
+  .addEventListener("click", () => {
+    if (!syncDraftInputs()) return;
+
+    const overlay = showModal(
+      "➕ Add Exercise",
+      `
+        <label class="form-label">
+          Exercise Name
+          <input
+            id="historyExerciseName"
+            class="inline-edit"
+            type="text"
+            placeholder="e.g. Face Pull"
+          >
+        </label>
+
+        <p id="historyExerciseError" class="form-error" hidden></p>
+
+        <button
+          class="button-success"
+          id="confirmAddHistoryExercise"
+          type="button"
+        >
+          Add Exercise
+        </button>
+      `,
+      "Cancel"
+    );
+
+    const nameInput =
+      document.getElementById("historyExerciseName");
+
+    const errorMessage =
+      document.getElementById("historyExerciseError");
+
+    const addButton =
+      document.getElementById("confirmAddHistoryExercise");
+
+    nameInput.focus();
+
+    function addExercise() {
+      const name = nameInput.value.trim().replace(/\s+/g, " ");
+
+      if (!name) {
+        errorMessage.textContent = "Please enter an exercise name.";
+        errorMessage.hidden = false;
+        nameInput.focus();
+        return;
+      }
+
+      const duplicate = draftWorkout.exercises.some(
+        (exercise) =>
+          exercise.name.trim().toLowerCase() === name.toLowerCase()
+      );
+
+      if (duplicate) {
+        errorMessage.textContent =
+          "This exercise is already in the workout.";
+        errorMessage.hidden = false;
+        return;
+      }
+
+      const exercise = createExercise(name);
+
+      // Keep the exercise ID unique within this workout.
+      const existingIds = new Set(
+        draftWorkout.exercises.map((item) => item.id)
+      );
+
+      while (existingIds.has(exercise.id)) {
+        exercise.id = Math.max(
+          0,
+          ...draftWorkout.exercises.map((item) => Number(item.id) || 0)
+        ) + 1;
+      }
+
+      draftWorkout.exercises.push(exercise);
+
+      overlay.remove();
+
+      renderHistoryWorkoutDraft(workoutId, draftWorkout);
+    }
+
+    addButton.addEventListener("click", addExercise);
+
+    nameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addExercise();
+      }
+    });
+  });
 
   document.querySelectorAll(".history-add-set").forEach((button) => {
     button.addEventListener("click", () => {
