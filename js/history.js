@@ -291,9 +291,9 @@ function showHistoryWorkoutEditor(workoutId) {
   });
 
   html += `
-      <button class="button-success" id="saveHistoryChanges" disabled>
-        Save Changes
-      </button>
+     <button class="button-success" id="saveHistoryChanges">
+  Save Changes
+</button>
 
       <button class="button-secondary" id="cancelHistoryChanges">
         Cancel
@@ -345,6 +345,47 @@ function showHistoryWorkoutEditor(workoutId) {
       draftWorkout.exercises[exerciseIndex].sets[setIndex].reps = value;
     });
   });
+
+  document
+    .getElementById("saveHistoryChanges")
+    .addEventListener("click", () => {
+      const inputs = container.querySelectorAll(
+        ".history-weight, .history-reps"
+      );
+
+      // Check every field before saving.
+      for (const input of inputs) {
+        if (
+          !input.value.trim() ||
+          !input.checkValidity()
+        ) {
+          input.reportValidity();
+          input.focus();
+          return;
+        }
+      }
+
+      const latestData = loadData();
+
+      const historyIndex = latestData.history.findIndex(
+        (workout) => workout.id === workoutId
+      );
+
+      if (historyIndex === -1) {
+        showModal(
+          "Workout Not Found",
+          "<p>This workout could not be saved.</p>"
+        );
+        return;
+      }
+
+      // Replace only the selected historical workout.
+      latestData.history[historyIndex] = draftWorkout;
+
+      saveData(latestData);
+
+      showWorkoutHistoryDetail(workoutId);
+    });
 
   document
     .getElementById("cancelHistoryChanges")
