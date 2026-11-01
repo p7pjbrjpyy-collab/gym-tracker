@@ -132,7 +132,11 @@ function showWorkoutHistoryDetail(workoutId) {
     `;
   });
 
-  html += `
+    html += `
+      <button class="button-primary" id="editHistoryWorkout">
+        ✏️ Edit Workout
+      </button>
+
       <button class="button-secondary" id="backToHistory">
         ← Workout History
       </button>
@@ -144,6 +148,23 @@ function showWorkoutHistoryDetail(workoutId) {
   `;
 
   container.innerHTML = html;
+
+    document
+    .getElementById("editHistoryWorkout")
+    .addEventListener("click", () => {
+      showModal(
+        "✏️ Edit Workout",
+        `
+          <p>
+            Historical workout editing is coming next.
+          </p>
+
+          <p>
+            Your existing workout has not been changed.
+          </p>
+        `
+      );
+    });
 
   document.getElementById("backToHistory").addEventListener("click", () => {
     showHistory();
