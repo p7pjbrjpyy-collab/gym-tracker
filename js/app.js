@@ -440,6 +440,13 @@ function showActiveExerciseMenu(exerciseId) {
       >
         ⬇️ Move Down
       </button>
+
+            <button
+        class="button-danger"
+        id="removeExercise"
+      >
+        🗑️ Remove Exercise
+      </button>
     `,
     "Close",
   );
@@ -457,6 +464,30 @@ function showActiveExerciseMenu(exerciseId) {
       overlay.remove();
       moveActiveExercise(exerciseId, 1);
     });
+
+      document
+    .getElementById("removeExercise")
+    .addEventListener("click", () => {
+      overlay.remove();
+      removeActiveExercise(exerciseId);
+    });
+}
+
+function removeActiveExercise(exerciseId) {
+  const gymData = loadData();
+
+  if (!gymData.activeWorkout) {
+    return;
+  }
+
+  gymData.activeWorkout.exercises =
+    gymData.activeWorkout.exercises.filter(
+      (exercise) => exercise.id !== exerciseId
+    );
+
+  updateActiveWorkoutTimestamp(gymData);
+  saveData(gymData);
+  renderWorkout();
 }
 
 function moveActiveExercise(exerciseId, direction) {
