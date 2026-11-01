@@ -36,7 +36,11 @@ function showHistory() {
     });
   }
 
-  html += `
+    html += `
+      <button class="button-secondary" id="exportBackup">
+        📥 Export Backup
+      </button>
+
       <button class="button-secondary" id="historyHome">
         🏠 Return Home
       </button>
@@ -51,6 +55,10 @@ function showHistory() {
 
       showWorkoutHistoryDetail(workoutId);
     });
+  });
+
+    document.getElementById("exportBackup").addEventListener("click", () => {
+    exportGymTrackerBackup();
   });
 
   document.getElementById("historyHome").addEventListener("click", () => {

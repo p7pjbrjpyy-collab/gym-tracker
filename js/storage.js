@@ -39,3 +39,31 @@ function saveData(data) {
 function resetData() {
     localStorage.removeItem(STORAGE_KEY);
 }
+
+function exportGymTrackerBackup() {
+  const savedData = localStorage.getItem(STORAGE_KEY);
+
+  if (!savedData) {
+    alert("No Gym Tracker data found to export.");
+    return;
+  }
+
+  const blob = new Blob([savedData], {
+    type: "application/json",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  const date = new Date().toISOString().slice(0, 10);
+
+  link.href = url;
+  link.download = `gym-tracker-backup-${date}.json`;
+
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
