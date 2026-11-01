@@ -232,6 +232,24 @@ function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
       <div class="exercise-title">
         <h2>${exercise.name}</h2>
 
+<button
+  class="small-button history-move-up"
+  data-exercise-index="${exerciseIndex}"
+  type="button"
+  ${exerciseIndex === 0 ? "disabled" : ""}
+>
+  ↑
+</button>
+
+<button
+  class="small-button history-move-down"
+  data-exercise-index="${exerciseIndex}"
+  type="button"
+  ${exerciseIndex === draftWorkout.exercises.length - 1 ? "disabled" : ""}
+>
+  ↓
+</button>
+
         <button
           class="small-button history-remove-exercise"
           data-exercise-index="${exerciseIndex}"
@@ -383,6 +401,37 @@ function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
 
     return valid;
   }
+
+document.querySelectorAll(".history-move-up, .history-move-down")
+  .forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!syncDraftInputs()) return;
+
+      const index = Number(button.dataset.exerciseIndex);
+
+      const direction = button.classList.contains("history-move-up")
+        ? -1
+        : 1;
+
+      const newIndex = index + direction;
+
+      if (
+        newIndex < 0 ||
+        newIndex >= draftWorkout.exercises.length
+      ) {
+        return;
+      }
+
+      const exercises = draftWorkout.exercises;
+
+      [exercises[index], exercises[newIndex]] = [
+        exercises[newIndex],
+        exercises[index],
+      ];
+
+      renderHistoryWorkoutDraft(workoutId, draftWorkout);
+    });
+  });
 
 document.querySelectorAll(".history-remove-exercise").forEach((button) => {
   button.addEventListener("click", () => {
