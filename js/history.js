@@ -213,21 +213,7 @@ function formatWorkoutDate(dateString) {
   });
 }
 
-function showHistoryWorkoutEditor(workoutId) {
-  const gymData = loadData();
-
-  const originalWorkout = gymData.history.find(
-    (workout) => workout.id === workoutId
-  );
-
-  if (!originalWorkout) {
-    showHistory();
-    return;
-  }
-
-  // Work on a copy, not the saved workout.
-  const draftWorkout = structuredClone(originalWorkout);
-
+function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
   const container = document.querySelector(".container");
 
   let html = `
@@ -237,7 +223,6 @@ function showHistoryWorkoutEditor(workoutId) {
         ${formatWorkoutDate(draftWorkout.date)}
       </p>
     </header>
-
     <main>
   `;
 
@@ -280,7 +265,24 @@ function showHistoryWorkoutEditor(workoutId) {
       `;
     });
 
-       html += `
+    html += `
+        </div>
+
+        <div class="set-actions">
+          <button
+            class="small-button history-add-set"
+            data-exercise-index="${exerciseIndex}"
+          >
+            ➕ Add Set
+          </button>
+
+          <button
+            class="small-button history-remove-set"
+            data-exercise-index="${exerciseIndex}"
+            ${exercise.sets.length <= 1 ? "disabled" : ""}
+          >
+            ➖ Remove Last Set
+          </button>
         </div>
 
         <p>
@@ -290,7 +292,6 @@ function showHistoryWorkoutEditor(workoutId) {
             type="text"
             data-exercise-index="${exerciseIndex}"
             value="${exercise.rest ?? ""}"
-            aria-label="Rest period for ${exercise.name}"
           >
         </p>
       </div>
@@ -298,9 +299,9 @@ function showHistoryWorkoutEditor(workoutId) {
   });
 
   html += `
-     <button class="button-success" id="saveHistoryChanges">
-  Save Changes
-</button>
+      <button class="button-success" id="saveHistoryChanges">
+        Save Changes
+      </button>
 
       <button class="button-secondary" id="cancelHistoryChanges">
         Cancel
@@ -310,14 +311,18 @@ function showHistoryWorkoutEditor(workoutId) {
 
   container.innerHTML = html;
 
-  document.querySelectorAll(".history-weight").forEach((input) => {
-    input.addEventListener("input", () => {
+  // Synchronise all visible fields with the draft before redrawing.
+  function syncDraftInputs() {
+    let valid = true;
+
+    container.querySelectorAll(".history-weight").forEach((input) => {
       const exerciseIndex = Number(input.dataset.exerciseIndex);
       const setIndex = Number(input.dataset.setIndex);
       const value = Number(input.value);
 
       if (!input.value.trim() || !Number.isFinite(value) || value < 0) {
         input.setCustomValidity("Enter a valid weight.");
+        valid = false;
         return;
       }
 
@@ -330,10 +335,8 @@ function showHistoryWorkoutEditor(workoutId) {
         unit: set.weight?.unit || "kg",
       };
     });
-  });
 
-  document.querySelectorAll(".history-reps").forEach((input) => {
-    input.addEventListener("input", () => {
+    container.querySelectorAll(".history-reps").forEach((input) => {
       const exerciseIndex = Number(input.dataset.exerciseIndex);
       const setIndex = Number(input.dataset.setIndex);
       const value = Number(input.value);
@@ -344,6 +347,7 @@ function showHistoryWorkoutEditor(workoutId) {
         value < 0
       ) {
         input.setCustomValidity("Enter a valid number of reps.");
+        valid = false;
         return;
       }
 
@@ -351,35 +355,64 @@ function showHistoryWorkoutEditor(workoutId) {
 
       draftWorkout.exercises[exerciseIndex].sets[setIndex].reps = value;
     });
+
+    container.querySelectorAll(".history-rest").forEach((input) => {
+      const exerciseIndex = Number(input.dataset.exerciseIndex);
+      draftWorkout.exercises[exerciseIndex].rest = input.value;
+    });
+
+    if (!valid) {
+      const invalidInput = container.querySelector(":invalid");
+
+      if (invalidInput) {
+        invalidInput.reportValidity();
+        invalidInput.focus();
+      }
+    }
+
+    return valid;
+  }
+
+  document.querySelectorAll(".history-add-set").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!syncDraftInputs()) return;
+
+      const exerciseIndex = Number(button.dataset.exerciseIndex);
+      const exercise = draftWorkout.exercises[exerciseIndex];
+
+      const lastSet = exercise.sets[exercise.sets.length - 1];
+
+      exercise.sets.push({
+        setNumber: lastSet.setNumber + 1,
+        weight: lastSet.weight
+          ? { ...lastSet.weight }
+          : null,
+        reps: lastSet.reps,
+      });
+
+      renderHistoryWorkoutDraft(workoutId, draftWorkout);
+    });
   });
 
-  document.querySelectorAll(".history-rest").forEach((input) => {
-    input.addEventListener("input", () => {
-      const exerciseIndex = Number(input.dataset.exerciseIndex);
+  document.querySelectorAll(".history-remove-set").forEach((button) => {
+    button.addEventListener("click", () => {
+      if (!syncDraftInputs()) return;
 
-      draftWorkout.exercises[exerciseIndex].rest =
-        input.value;
+      const exerciseIndex = Number(button.dataset.exerciseIndex);
+      const exercise = draftWorkout.exercises[exerciseIndex];
+
+      if (exercise.sets.length <= 1) return;
+
+      exercise.sets.pop();
+
+      renderHistoryWorkoutDraft(workoutId, draftWorkout);
     });
   });
 
   document
     .getElementById("saveHistoryChanges")
     .addEventListener("click", () => {
-      const inputs = container.querySelectorAll(
-        ".history-weight, .history-reps"
-      );
-
-      // Check every field before saving.
-      for (const input of inputs) {
-        if (
-          !input.value.trim() ||
-          !input.checkValidity()
-        ) {
-          input.reportValidity();
-          input.focus();
-          return;
-        }
-      }
+      if (!syncDraftInputs()) return;
 
       const latestData = loadData();
 
@@ -395,11 +428,9 @@ function showHistoryWorkoutEditor(workoutId) {
         return;
       }
 
-      // Replace only the selected historical workout.
       latestData.history[historyIndex] = draftWorkout;
 
       saveData(latestData);
-
       showWorkoutHistoryDetail(workoutId);
     });
 
@@ -408,4 +439,22 @@ function showHistoryWorkoutEditor(workoutId) {
     .addEventListener("click", () => {
       showWorkoutHistoryDetail(workoutId);
     });
+}
+
+function showHistoryWorkoutEditor(workoutId) {
+  const gymData = loadData();
+
+  const originalWorkout = gymData.history.find(
+    (workout) => workout.id === workoutId
+  );
+
+  if (!originalWorkout) {
+    showHistory();
+    return;
+  }
+
+  // Create a separate copy so Cancel never changes saved history.
+  const draftWorkout = structuredClone(originalWorkout);
+
+  renderHistoryWorkoutDraft(workoutId, draftWorkout);
 }
