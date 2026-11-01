@@ -149,21 +149,10 @@ function showWorkoutHistoryDetail(workoutId) {
 
   container.innerHTML = html;
 
-    document
+      document
     .getElementById("editHistoryWorkout")
     .addEventListener("click", () => {
-      showModal(
-        "✏️ Edit Workout",
-        `
-          <p>
-            Historical workout editing is coming next.
-          </p>
-
-          <p>
-            Your existing workout has not been changed.
-          </p>
-        `
-      );
+      showHistoryWorkoutEditor(workoutId);
     });
 
   document.getElementById("backToHistory").addEventListener("click", () => {
@@ -222,4 +211,144 @@ function formatWorkoutDate(dateString) {
     month: "short",
     year: "numeric",
   });
+}
+
+function showHistoryWorkoutEditor(workoutId) {
+  const gymData = loadData();
+
+  const originalWorkout = gymData.history.find(
+    (workout) => workout.id === workoutId
+  );
+
+  if (!originalWorkout) {
+    showHistory();
+    return;
+  }
+
+  // Work on a copy, not the saved workout.
+  const draftWorkout = structuredClone(originalWorkout);
+
+  const container = document.querySelector(".container");
+
+  let html = `
+    <header>
+      <h1>✏️ Edit Workout</h1>
+      <p class="subtitle">
+        ${formatWorkoutDate(draftWorkout.date)}
+      </p>
+    </header>
+
+    <main>
+  `;
+
+  draftWorkout.exercises.forEach((exercise, exerciseIndex) => {
+    html += `
+      <div class="exercise-card">
+        <h2>${exercise.name}</h2>
+        <div class="set-list">
+    `;
+
+    exercise.sets.forEach((set, setIndex) => {
+      html += `
+        <div class="set-row">
+          <span>Set ${set.setNumber}</span>
+
+          <input
+            class="inline-edit history-weight"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="any"
+            data-exercise-index="${exerciseIndex}"
+            data-set-index="${setIndex}"
+            value="${set.weight?.value ?? 0}"
+            aria-label="Set ${set.setNumber} weight"
+          >
+
+          <input
+            class="inline-edit history-reps"
+            type="number"
+            inputmode="numeric"
+            min="0"
+            step="1"
+            data-exercise-index="${exerciseIndex}"
+            data-set-index="${setIndex}"
+            value="${set.reps ?? 0}"
+            aria-label="Set ${set.setNumber} reps"
+          >
+        </div>
+      `;
+    });
+
+    html += `
+        </div>
+
+        <p>
+          <strong>Rest:</strong> ${exercise.rest}
+        </p>
+      </div>
+    `;
+  });
+
+  html += `
+      <button class="button-success" id="saveHistoryChanges" disabled>
+        Save Changes
+      </button>
+
+      <button class="button-secondary" id="cancelHistoryChanges">
+        Cancel
+      </button>
+    </main>
+  `;
+
+  container.innerHTML = html;
+
+  document.querySelectorAll(".history-weight").forEach((input) => {
+    input.addEventListener("input", () => {
+      const exerciseIndex = Number(input.dataset.exerciseIndex);
+      const setIndex = Number(input.dataset.setIndex);
+      const value = Number(input.value);
+
+      if (!input.value.trim() || !Number.isFinite(value) || value < 0) {
+        input.setCustomValidity("Enter a valid weight.");
+        return;
+      }
+
+      input.setCustomValidity("");
+
+      const set = draftWorkout.exercises[exerciseIndex].sets[setIndex];
+
+      set.weight = {
+        value,
+        unit: set.weight?.unit || "kg",
+      };
+    });
+  });
+
+  document.querySelectorAll(".history-reps").forEach((input) => {
+    input.addEventListener("input", () => {
+      const exerciseIndex = Number(input.dataset.exerciseIndex);
+      const setIndex = Number(input.dataset.setIndex);
+      const value = Number(input.value);
+
+      if (
+        !input.value.trim() ||
+        !Number.isInteger(value) ||
+        value < 0
+      ) {
+        input.setCustomValidity("Enter a valid number of reps.");
+        return;
+      }
+
+      input.setCustomValidity("");
+
+      draftWorkout.exercises[exerciseIndex].sets[setIndex].reps = value;
+    });
+  });
+
+  document
+    .getElementById("cancelHistoryChanges")
+    .addEventListener("click", () => {
+      showWorkoutHistoryDetail(workoutId);
+    });
 }
