@@ -616,10 +616,85 @@ document.getElementById("addHistoryExercise")
     });
 
   document
-    .getElementById("cancelHistoryChanges")
-    .addEventListener("click", () => {
-      showWorkoutHistoryDetail(workoutId);
+  .getElementById("cancelHistoryChanges")
+  .addEventListener("click", () => {
+    // Capture any edits still visible in the input fields.
+    // Invalid inputs are still treated as unsaved changes.
+    container.querySelectorAll(".history-weight").forEach((input) => {
+      const exerciseIndex = Number(input.dataset.exerciseIndex);
+      const setIndex = Number(input.dataset.setIndex);
+      const set = draftWorkout.exercises[exerciseIndex].sets[setIndex];
+
+      const value = input.value.trim();
+
+      set.weight = {
+        value: value === "" ? "" : Number(value),
+        unit: set.weight?.unit || "kg",
+      };
     });
+
+    container.querySelectorAll(".history-reps").forEach((input) => {
+      const exerciseIndex = Number(input.dataset.exerciseIndex);
+      const setIndex = Number(input.dataset.setIndex);
+
+      const value = input.value.trim();
+
+      draftWorkout.exercises[exerciseIndex].sets[setIndex].reps =
+        value === "" ? "" : Number(value);
+    });
+
+    container.querySelectorAll(".history-rest").forEach((input) => {
+      const exerciseIndex = Number(input.dataset.exerciseIndex);
+
+      draftWorkout.exercises[exerciseIndex].rest = input.value;
+    });
+
+    const savedWorkout = loadData().history.find(
+      (workout) => workout.id === workoutId
+    );
+
+    if (!savedWorkout) {
+      showHistory();
+      return;
+    }
+
+    const hasChanges =
+      JSON.stringify(draftWorkout) !== JSON.stringify(savedWorkout);
+
+    if (!hasChanges) {
+      showWorkoutHistoryDetail(workoutId);
+      return;
+    }
+
+    const overlay = showModal(
+      "Discard Changes?",
+      `
+        <p>
+          You have unsaved changes to this workout.
+        </p>
+
+        <p>
+          Discarding will lose those changes.
+        </p>
+
+        <button
+          class="button-danger"
+          id="confirmDiscardHistoryChanges"
+          type="button"
+        >
+          Discard Changes
+        </button>
+      `,
+      "Keep Editing"
+    );
+
+    document
+      .getElementById("confirmDiscardHistoryChanges")
+      .addEventListener("click", () => {
+        overlay.remove();
+        showWorkoutHistoryDetail(workoutId);
+      });
+  });
 }
 
 function showHistoryWorkoutEditor(workoutId) {
