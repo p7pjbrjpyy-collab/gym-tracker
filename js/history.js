@@ -226,12 +226,23 @@ function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
     <main>
   `;
 
-  draftWorkout.exercises.forEach((exercise, exerciseIndex) => {
-    html += `
-      <div class="exercise-card">
+ draftWorkout.exercises.forEach((exercise, exerciseIndex) => {
+  html += `
+    <div class="exercise-card">
+      <div class="exercise-title">
         <h2>${exercise.name}</h2>
-        <div class="set-list">
-    `;
+
+        <button
+          class="small-button history-remove-exercise"
+          data-exercise-index="${exerciseIndex}"
+          type="button"
+        >
+          Remove
+        </button>
+      </div>
+
+      <div class="set-list">
+  `;
 
     exercise.sets.forEach((set, setIndex) => {
       html += `
@@ -372,6 +383,25 @@ function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
 
     return valid;
   }
+
+document.querySelectorAll(".history-remove-exercise").forEach((button) => {
+  button.addEventListener("click", () => {
+    if (!syncDraftInputs()) return;
+
+    const exerciseIndex = Number(button.dataset.exerciseIndex);
+    const exercise = draftWorkout.exercises[exerciseIndex];
+
+    const confirmed = confirm(
+      `Remove "${exercise.name}" from this workout?`
+    );
+
+    if (!confirmed) return;
+
+    draftWorkout.exercises.splice(exerciseIndex, 1);
+
+    renderHistoryWorkoutDraft(workoutId, draftWorkout);
+  });
+});
 
   document.querySelectorAll(".history-add-set").forEach((button) => {
     button.addEventListener("click", () => {
