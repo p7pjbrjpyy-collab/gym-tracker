@@ -354,3 +354,14 @@ button:disabled {
   cursor: default;
 }
 
+.exercise-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.exercise-actions button {
+  min-width: 36px;
+  min-height: 36px;
+}

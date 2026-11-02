@@ -320,17 +320,40 @@ if (activeWorkout.exercises.length === 0) {
       class="exercise-card active-exercise-card"
       data-exercise-id="${exercise.id}"
     >
-      <div class="exercise-title">
-        <h2>${exercise.name}</h2>
+     <div class="exercise-title">
+  <h2>${exercise.name}</h2>
 
-        <button
-          class="exercise-menu-button"
-          data-exercise-id="${exercise.id}"
-          aria-label="Reorder ${exercise.name}"
-        >
-          ⋯
-        </button>
-      </div>
+  <div class="exercise-actions">
+    <button
+      class="small-button active-move-up"
+      data-exercise-id="${exercise.id}"
+      type="button"
+      aria-label="Move ${exercise.name} up"
+      ${activeWorkout.exercises.indexOf(exercise) === 0 ? "disabled" : ""}
+    >
+      ↑
+    </button>
+
+    <button
+      class="small-button active-move-down"
+      data-exercise-id="${exercise.id}"
+      type="button"
+      aria-label="Move ${exercise.name} down"
+      ${activeWorkout.exercises.indexOf(exercise) === activeWorkout.exercises.length - 1 ? "disabled" : ""}
+    >
+      ↓
+    </button>
+
+    <button
+      class="exercise-menu-button"
+      data-exercise-id="${exercise.id}"
+      aria-label="Options for ${exercise.name}"
+      type="button"
+    >
+      ⋯
+    </button>
+  </div>
+</div>
 
       ${createSetRows(exercise)}
 
@@ -392,6 +415,23 @@ if (addExerciseButton) {
   attachRestEditHandlers();
   attachSetButtons();
   attachExerciseMenuHandlers();
+  attachActiveReorderButtons();
+}
+
+function attachActiveReorderButtons() {
+  document
+    .querySelectorAll(".active-move-up, .active-move-down")
+    .forEach((button) => {
+      button.addEventListener("click", () => {
+        const exerciseId = Number(button.dataset.exerciseId);
+
+        const direction = button.classList.contains("active-move-up")
+          ? -1
+          : 1;
+
+        moveActiveExercise(exerciseId, direction);
+      });
+    });
 }
 
 function attachExerciseMenuHandlers() {
