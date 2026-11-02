@@ -45,9 +45,10 @@ function createActiveWorkoutFromWorkout(workout) {
         exercises: workout.exercises.map((exercise) => {
             return {
                 id: exercise.id,
-                name: exercise.name,
-                rest: exercise.rest,
-                coachNote: exercise.coachNote || "",
+name: exercise.name,
+rest: exercise.rest,
+coachNote: exercise.coachNote || "",
+notes: exercise.notes ?? "",
 
                 sets: exercise.sets.map((set) => {
                     return {
