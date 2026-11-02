@@ -49,38 +49,13 @@ function showHistory() {
 
   container.innerHTML = html;
 
-document.querySelectorAll(".history-card").forEach((card) => {
-  card.addEventListener("click", () => {
-    const row = card.closest(".history-swipe-row");
+  document.querySelectorAll(".history-card").forEach((card) => {
+    card.addEventListener("click", () => {
+      const workoutId = Number(card.dataset.workoutId);
 
-    if (row.dataset.ignoreClick === "true") {
-      row.dataset.ignoreClick = "false";
-      return;
-    }
-
-    if (row.classList.contains("swiped")) {
-      row.classList.remove("swiped");
-      return;
-    }
-
-    showWorkoutHistoryDetail(Number(card.dataset.workoutId));
+      showWorkoutHistoryDetail(workoutId);
+    });
   });
-
-  card.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      showWorkoutHistoryDetail(Number(card.dataset.workoutId));
-    }
-  });
-});
-
-document.querySelectorAll(".history-swipe-delete").forEach((button) => {
-  button.addEventListener("click", () => {
-    showDeleteHistoryWorkoutModal(Number(button.dataset.workoutId));
-  });
-});
-
-attachHistorySwipeHandlers();
 
     document.getElementById("exportBackup").addEventListener("click", () => {
     exportGymTrackerBackup();
@@ -93,32 +68,26 @@ attachHistorySwipeHandlers();
 
 function createHistoryCard(workout) {
   return `
-    <div class="history-swipe-row">
-      <button
-        class="history-swipe-delete"
-        type="button"
-        data-workout-id="${workout.id}"
-        aria-label="Delete workout from ${formatWorkoutDate(workout.date)}"
-      >
-        🗑️ Delete
-      </button>
+    <div
+      class="exercise-card manage-card history-card"
+      data-workout-id="${workout.id}"
+    >
+      <div class="exercise-title">
+        <h2>${formatWorkoutDate(workout.date)}</h2>
 
-      <div
-        class="exercise-card manage-card history-card"
-        data-workout-id="${workout.id}"
-        tabindex="0"
-        role="button"
-      >
-        <div class="exercise-title">
-          <h2>${formatWorkoutDate(workout.date)}</h2>
+        <span class="chevron">
+          ›
+        </span>
+      </div>
 
-          <span class="chevron">›</span>
-        </div>
+      <div class="exercise-summary">
+        <span>
+          ${workout.exercises.length} exercises
+        </span>
 
-        <div class="exercise-summary">
-          <span>${workout.exercises.length} exercises</span>
-          <span>Completed</span>
-        </div>
+        <span>
+          Completed
+        </span>
       </div>
     </div>
   `;
@@ -829,116 +798,4 @@ function showDeleteHistoryWorkoutModal(workoutId) {
 
       showHistory();
     });
-}
-
-function attachHistorySwipeHandlers() {
-  const rows = document.querySelectorAll(".history-swipe-row");
-
-  rows.forEach((row) => {
-    const card = row.querySelector(".history-card");
-
-    let startX = 0;
-    let startY = 0;
-    let swiping = false;
-
-    card.addEventListener(
-      "touchstart",
-      (event) => {
-        const touch = event.touches[0];
-
-        startX = touch.clientX;
-        startY = touch.clientY;
-        swiping = false;
-      },
-      { passive: true }
-    );
-
-    card.addEventListener(
-      "touchmove",
-      (event) => {
-        const touch = event.touches[0];
-
-        const deltaX = touch.clientX - startX;
-        const deltaY = touch.clientY - startY;
-
-        if (Math.abs(deltaX) > 20 &&
-            Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
-          swiping = true;
-        }
-      },
-      { passive: true }
-    );
-
-    card.addEventListener("touchend", (event) => {
-      if (!swiping) return;
-
-      const touch = event.changedTouches[0];
-      const deltaX = touch.clientX - startX;
-
-      if (deltaX < -50) {
-        document.querySelectorAll(".history-swipe-row.swiped")
-          .forEach((openRow) => {
-            if (openRow !== row) {
-              openRow.classList.remove("swiped");
-            }
-          });
-
-        row.classList.add("swiped");
-      } else if (deltaX > 50) {
-        row.classList.remove("swiped");
-      }
-
-      row.dataset.ignoreClick = "true";
-
-      // Clear the flag after the gesture-generated click has had
-      // an opportunity to fire.
-      setTimeout(() => {
-        row.dataset.ignoreClick = "false";
-      }, 350);
-    });
-  });
-}
-
-/* Workout History — swipe to delete */
-
-.history-swipe-row {
-  position: relative;
-  overflow: hidden;
-  border-radius: 12px;
-  margin-bottom: 12px;
-}
-
-.history-swipe-row .history-card {
-  position: relative;
-  z-index: 1;
-  margin-bottom: 0;
-  width: 100%;
-  box-sizing: border-box;
-  transition: transform 0.2s ease;
-  touch-action: pan-y;
-}
-
-.history-swipe-row.swiped .history-card {
-  transform: translateX(-100px);
-}
-
-.history-swipe-delete {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 100px;
-  border: none;
-  border-radius: 0;
-  background: #c93434;
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.history-swipe-delete:focus-visible,
-.history-card:focus-visible {
-  outline: 3px solid #2563eb;
-  outline-offset: -3px;
 }
