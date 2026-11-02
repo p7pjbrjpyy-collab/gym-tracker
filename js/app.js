@@ -1025,20 +1025,18 @@ function saveEditedWeightValue(element, newValue) {
     unit,
   };
 
-  if (setNumber === 1) {
-    exercise.sets.forEach((otherSet) => {
-      if (
-        otherSet.setNumber !== 1 &&
-        otherSet.weight &&
-        otherSet.weight.value === previousValue
-      ) {
-        otherSet.weight = {
-          value: parsedValue,
-          unit: otherSet.weight.unit || unit,
-        };
-      }
-    });
+  exercise.sets.forEach((otherSet) => {
+  if (
+    otherSet.setNumber > setNumber &&
+    otherSet.weight &&
+    otherSet.weight.value === previousValue
+  ) {
+    otherSet.weight = {
+      value: parsedValue,
+      unit: otherSet.weight.unit || unit,
+    };
   }
+});
 
   updateActiveWorkoutTimestamp(gymData);
   saveData(gymData);
