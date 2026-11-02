@@ -1017,7 +1017,6 @@ function saveEditedWeightValue(element, newValue) {
     return;
   }
 
-  const previousValue = set.weight ? set.weight.value : 0;
   const unit = set.weight ? set.weight.unit : "kg";
 
   set.weight = {
@@ -1025,15 +1024,11 @@ function saveEditedWeightValue(element, newValue) {
     unit,
   };
 
-  exercise.sets.forEach((otherSet) => {
-  if (
-    otherSet.setNumber > setNumber &&
-    otherSet.weight &&
-    otherSet.weight.value === previousValue
-  ) {
+ exercise.sets.forEach((otherSet) => {
+  if (otherSet.setNumber > setNumber) {
     otherSet.weight = {
       value: parsedValue,
-      unit: otherSet.weight.unit || unit,
+      unit: otherSet.weight?.unit || unit,
     };
   }
 });
