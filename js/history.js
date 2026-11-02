@@ -141,7 +141,13 @@ function showWorkoutHistoryDetail(workoutId) {
       <button class="button-primary" id="editHistoryWorkout">
         ✏️ Edit Workout
       </button>
-
+<button
+  class="button-danger"
+  id="deleteHistoryWorkout"
+  type="button"
+>
+  🗑️ Delete Workout
+</button>
       <button class="button-secondary" id="backToHistory">
         ← Workout History
       </button>
@@ -166,6 +172,12 @@ function showWorkoutHistoryDetail(workoutId) {
     .addEventListener("click", () => {
       showHistoryWorkoutEditor(workoutId);
     });
+
+    document
+  .getElementById("deleteHistoryWorkout")
+  .addEventListener("click", () => {
+    showDeleteHistoryWorkoutModal(workoutId);
+  });
 
   document.getElementById("backToHistory").addEventListener("click", () => {
     showHistory();
@@ -725,4 +737,65 @@ function showHistoryWorkoutEditor(workoutId) {
   const draftWorkout = structuredClone(originalWorkout);
 
   renderHistoryWorkoutDraft(workoutId, draftWorkout);
+}
+
+function showDeleteHistoryWorkoutModal(workoutId) {
+  const gymData = loadData();
+
+  const workout = gymData.history.find(
+    (item) => item.id === workoutId
+  );
+
+  if (!workout) {
+    showHistory();
+    return;
+  }
+
+  const overlay = showModal(
+    "🗑️ Delete Workout?",
+    `
+      <p>
+        Delete the workout from
+        <strong>${formatWorkoutDate(workout.date)}</strong>?
+      </p>
+
+      <p>
+        This will permanently remove the workout and
+        all its exercises, sets and notes.
+      </p>
+
+      <button
+        class="button-danger"
+        id="confirmDeleteHistoryWorkout"
+        type="button"
+      >
+        Delete Workout
+      </button>
+    `,
+    "Keep Workout"
+  );
+
+  document
+    .getElementById("confirmDeleteHistoryWorkout")
+    .addEventListener("click", () => {
+      const latestData = loadData();
+
+      const workoutIndex = latestData.history.findIndex(
+        (item) => item.id === workoutId
+      );
+
+      if (workoutIndex === -1) {
+        overlay.remove();
+        showHistory();
+        return;
+      }
+
+      latestData.history.splice(workoutIndex, 1);
+
+      saveData(latestData);
+
+      overlay.remove();
+
+      showHistory();
+    });
 }
