@@ -367,6 +367,20 @@ if (activeWorkout.exercises.length === 0) {
           ${exercise.rest}
         </span>
       </p>
+
+      <div class="exercise-notes">
+  <label for="notes-${exercise.id}">
+    <strong>Notes</strong>
+  </label>
+
+  <textarea
+    id="notes-${exercise.id}"
+    class="exercise-notes-input"
+    data-exercise-id="${exercise.id}"
+    placeholder="Add notes for your next session..."
+    rows="2"
+  ></textarea>
+</div>
     </div>
   `;
 });
@@ -416,6 +430,7 @@ if (addExerciseButton) {
   attachSetButtons();
   attachExerciseMenuHandlers();
   attachActiveReorderButtons();
+  attachExerciseNotesHandlers();
 }
 
 function attachActiveReorderButtons() {
@@ -962,6 +977,37 @@ function attachRepEditHandlers() {
       input.addEventListener("blur", () => {
         saveEditedReps(element, input.value);
       });
+    });
+  });
+}
+
+function attachExerciseNotesHandlers() {
+  document.querySelectorAll(".exercise-notes-input").forEach((input) => {
+    const exerciseId = Number(input.dataset.exerciseId);
+
+    const gymData = loadData();
+
+    const exercise = gymData.activeWorkout?.exercises.find(
+      (item) => item.id === exerciseId
+    );
+
+    if (!exercise) return;
+
+    input.value = exercise.notes ?? "";
+
+    input.addEventListener("input", () => {
+      const latestData = loadData();
+
+      const latestExercise = latestData.activeWorkout?.exercises.find(
+        (item) => item.id === exerciseId
+      );
+
+      if (!latestExercise) return;
+
+      latestExercise.notes = input.value;
+
+      updateActiveWorkoutTimestamp(latestData);
+      saveData(latestData);
     });
   });
 }

@@ -365,3 +365,24 @@ button:disabled {
   min-width: 36px;
   min-height: 36px;
 }
+
+.exercise-notes {
+  margin-top: 12px;
+}
+
+.exercise-notes label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.exercise-notes-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  font: inherit;
+  resize: vertical;
+}
+
