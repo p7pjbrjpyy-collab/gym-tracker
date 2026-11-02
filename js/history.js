@@ -365,6 +365,21 @@ function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
             value="${exercise.rest ?? ""}"
           >
         </p>
+
+        <div class="exercise-notes">
+  <label for="history-notes-${exerciseIndex}">
+    <strong>Notes:</strong>
+  </label>
+
+  <textarea
+    id="history-notes-${exerciseIndex}"
+    class="exercise-notes-input history-notes"
+    data-exercise-index="${exerciseIndex}"
+    rows="3"
+    placeholder="Add exercise notes..."
+  ></textarea>
+</div>
+
       </div>
     `;
   });
@@ -389,6 +404,12 @@ function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
   `;
 
   container.innerHTML = html;
+
+  container.querySelectorAll(".history-notes").forEach((textarea) => {
+  const exerciseIndex = Number(textarea.dataset.exerciseIndex);
+
+  textarea.value = draftWorkout.exercises[exerciseIndex].notes ?? "";
+});
 
   // Synchronise all visible fields with the draft before redrawing.
   function syncDraftInputs() {
@@ -439,6 +460,12 @@ function renderHistoryWorkoutDraft(workoutId, draftWorkout) {
       const exerciseIndex = Number(input.dataset.exerciseIndex);
       draftWorkout.exercises[exerciseIndex].rest = input.value;
     });
+
+    container.querySelectorAll(".history-notes").forEach((textarea) => {
+  const exerciseIndex = Number(textarea.dataset.exerciseIndex);
+
+  draftWorkout.exercises[exerciseIndex].notes = textarea.value;
+});
 
     if (!valid) {
       const invalidInput = container.querySelector(":invalid");
@@ -685,13 +712,19 @@ document.getElementById("addHistoryExercise")
         value === "" ? "" : Number(value);
     });
 
-    container.querySelectorAll(".history-rest").forEach((input) => {
-      const exerciseIndex = Number(input.dataset.exerciseIndex);
+   container.querySelectorAll(".history-rest").forEach((input) => {
+  const exerciseIndex = Number(input.dataset.exerciseIndex);
 
-      draftWorkout.exercises[exerciseIndex].rest = input.value;
-    });
+  draftWorkout.exercises[exerciseIndex].rest = input.value;
+});
 
-    const savedWorkout = loadData().history.find(
+container.querySelectorAll(".history-notes").forEach((textarea) => {
+  const exerciseIndex = Number(textarea.dataset.exerciseIndex);
+
+  draftWorkout.exercises[exerciseIndex].notes = textarea.value;
+});
+
+const savedWorkout = loadData().history.find(
       (workout) => workout.id === workoutId
     );
 
