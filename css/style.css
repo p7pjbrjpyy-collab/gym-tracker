@@ -386,3 +386,8 @@ button:disabled {
   resize: vertical;
 }
 
+.history-note-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+

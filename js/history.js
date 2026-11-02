@@ -117,20 +117,25 @@ function showWorkoutHistoryDetail(workoutId) {
     <main>
   `;
 
-  workout.exercises.forEach((exercise) => {
-    html += `
-      <div class="exercise-card">
-        <h2>${exercise.name}</h2>
+  workout.exercises.forEach((exercise, exerciseIndex) => {
+  html += `
+    <div class="exercise-card">
+      <h2>${exercise.name}</h2>
 
-        ${createReadOnlySetRows(exercise)}
+      ${createReadOnlySetRows(exercise)}
 
-        <p>
-          <strong>Rest:</strong>
-          ${exercise.rest}
-        </p>
+      <p><strong>Rest:</strong> ${exercise.rest}</p>
+
+      <div class="exercise-notes">
+        <strong>Notes:</strong>
+        <p
+          class="history-note-text"
+          data-exercise-index="${exerciseIndex}"
+        ></p>
       </div>
-    `;
-  });
+    </div>
+  `;
+});
 
     html += `
       <button class="button-primary" id="editHistoryWorkout">
@@ -148,6 +153,13 @@ function showWorkoutHistoryDetail(workoutId) {
   `;
 
   container.innerHTML = html;
+
+  container.querySelectorAll(".history-note-text").forEach((element) => {
+  const exerciseIndex = Number(element.dataset.exerciseIndex);
+  const exercise = workout.exercises[exerciseIndex];
+
+  element.textContent = exercise.notes || "No notes recorded";
+});
 
       document
     .getElementById("editHistoryWorkout")
