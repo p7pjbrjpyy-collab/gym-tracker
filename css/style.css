@@ -391,3 +391,12 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
+/* Compact Delete button in Workout History */
+.history-card-delete {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  margin: 4px 0;
+}
+

@@ -57,6 +57,16 @@ function showHistory() {
     });
   });
 
+document.querySelectorAll(".history-card-delete").forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+
+    const workoutId = Number(button.dataset.workoutId);
+
+    showDeleteHistoryWorkoutModal(workoutId);
+  });
+});
+
     document.getElementById("exportBackup").addEventListener("click", () => {
     exportGymTrackerBackup();
   });
@@ -79,6 +89,14 @@ function createHistoryCard(workout) {
           ›
         </span>
       </div>
+
+      <button
+  class="button-danger history-card-delete"
+  type="button"
+  data-workout-id="${workout.id}"
+>
+  🗑️ Delete
+</button>
 
       <div class="exercise-summary">
         <span>
